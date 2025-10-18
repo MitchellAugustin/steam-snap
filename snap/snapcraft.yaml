@@ -9,6 +9,7 @@ grade: stable
 confinement: strict
 architectures:
   - build-on: amd64
+  - build-on: arm64
 base: core22
 compression: lzo
 assumes:
@@ -31,6 +32,18 @@ package-repositories:
     components: [steam]
     architectures: [amd64, i386]
     key-id: BA1816EF8E75005FCF5E27A1F24AEA9FB05498B7
+  - type: apt
+    url: https://ppa.launchpadcontent.net/fex-emu/fex/ubuntu
+    suites: [jammy]
+    components: [main]
+    architectures: [arm64]
+    key-id: EDB98BFE8A2310DC9C4A376E76DBFEBEA206F5AC
+  - type: apt
+    url: https://snapshot.ppa.launchpadcontent.net/mitchellaugustin/fex-ubuntu-rootfs-jammy/ubuntu
+    suites: [jammy]
+    components: [main]
+    architectures: [arm64]
+    key-id: 1D4F9CE6E1492B69C43E95A3D60AFA41A606BC01
 
 layout:
   /usr/lib/steam:
@@ -105,6 +118,10 @@ plugs:
     interface: personal-files
     write:
       - $HOME/.local/share/icons
+  dot-fex-emu:
+    interface: personal-files
+    write:
+      - $HOME/.fex-emu
   desktop:
     mount-host-font-cache: false
   shmem:
@@ -127,6 +144,30 @@ environment:
   LIBGL_DRIVERS_PATH: $SNAP/graphics/usr/lib/i386-linux-gnu/dri:$SNAP/graphics/usr/lib/x86_64-linux-gnu/dri:${LIBGL_DRIVERS_PATH:+:$LIBGL_DRIVERS_PATH}
 
 parts:
+  fex-emu:
+    plugin: nil
+    stage-packages:
+      - to arm64:
+        - fex-emu-armv8.4:arm64
+        - fex-emu-wine:arm64
+        - patchelf:arm64
+
+  fex-rootfs:
+    plugin: nil
+    stage-packages:
+      # Replace with your actual rootfs package name
+      - to arm64:
+        - ubuntu-fex-rootfs:arm64
+    override-prime: |
+      craftctl default
+      # This part only runs on arm64
+      if [ "$CRAFT_ARCH_BUILD_FOR" = "arm64" ]; then
+        # Configure FEX to use the rootfs from the snap's prime directory
+        # The user's writable config will be in $SNAP_USER_DATA/.fex-emu/
+        mkdir -p $CRAFT_PRIME/etc/fex-emu
+        echo '{"Config":{"RootFS":"/snap/steam/current/usr/share/fex-emu/RootFS/Ubuntu2404FexRootFS.sqsh"},"ThunksDB":{}}' > $CRAFT_PRIME/etc/fex-emu/Config.json
+      fi
+
   launcher:
     plugin: nil
     source: ./src
@@ -370,8 +411,9 @@ parts:
     source: https://github.com/ValveSoftware/steam-devices.git
 
   steam:
+    after: [fex-emu, fex-rootfs]
     plugin: nil
-    #source: http://repo.steampowered.com/steam/archive/precise/steam_latest.deb
+    source: . # To get the patch file
     build-packages:
       - dpkg-dev
       - dirmngr # Needed for launchpad builds
@@ -410,6 +452,11 @@ parts:
       craftctl default
       # Set the snap version from the .deb package version
       craftctl set version=$(dpkg-parsechangelog -l $CRAFT_PART_INSTALL/usr/share/doc/steam-launcher/changelog.amd64.gz -S Version | sed -e s/1://g)
+
+      # Apply the patch only on arm64 builds
+      if [ "$CRAFT_ARCH_BUILD_FOR" = "arm64" ]; then
+        patch -p1 $CRAFT_PART_INSTALL/usr/lib/steam/bin_steam.sh < $CRAFT_PART_SOURCE_DIR/patch_steam_for_arm64.patch
+      fi
     prime:
       - -usr/share/doc
       - -usr/share/man
@@ -479,6 +526,8 @@ apps:
     command: usr/lib/steam/bin_steam.sh -no-cef-sandbox
     environment:
       HOME: $SNAP_USER_COMMON
+      # FEX needs a predictable home for its config
+      FEX_APP_CONFIG_LOCATION: $SNAP_USER_DATA/.fex-emu
       #LIBGL_DEBUG: verbose
       TMPDIR: $XDG_RUNTIME_DIR
       ALWAYS_USE_PULSEAUDIO: 1
@@ -512,6 +561,8 @@ apps:
       - removable-media
       - upower-observe
       - uinput
+      # Added for FEX config
+      - dot-fex-emu
   report:
     command-chain: [bin/desktop-launch]
     command: bin/steamreport
