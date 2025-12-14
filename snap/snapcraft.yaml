@@ -27,6 +27,18 @@ lint:
         - lib32/**
         - usr/lib32/**
 
+package-repositories:
+  - type: apt
+    url: http://ports.ubuntu.com/ubuntu-ports/
+    suites: [noble, noble-updates]
+    components: [main, universe]
+    architectures: [arm64]
+    key-id: F6ECB3762474EDA9D21B7022871920D1991BC93C
+    key-server: keyserver.ubuntu.com
+  - type: apt
+    architectures: [arm64]
+    ppa: fex-emu/fex
+
 plugs:
   gaming-graphics-core24:
     interface: content
@@ -100,26 +112,26 @@ parts:
       - gaming-graphics-core24/candidate
   amd64-content:
     plugin: dump
-    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-12-12-25.3/steam_231_amd64.tar.gz
+    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-12-13-25.1/steam_231_amd64.tar.gz
     organize:
         steam_231_amd64: .
   amd64-rootfs:
     plugin: dump
-    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-12-12-25.3/amd64_rootfs.tar.gz
+    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-12-13-25.1/amd64_rootfs.tar.gz
     organize:
         amd64_rootfs: .
   fex-emu:
-    plugin: dump
-    source: ./fex-emu
-  fex-emu-wine:
-    plugin: dump
-    source: ./fex-emu-wine
+    plugin: nil
+    stage-packages:
+      - fex-emu-armv8.0
+      - fex-emu-wine
   fex-config:
     plugin: dump
     source: ./fex_config
   wget:
-    plugin: dump
-    source: ./wget
+    plugin: nil
+    stage-packags:
+      - wget
 
   
 apps:
