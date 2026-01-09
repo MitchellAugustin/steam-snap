@@ -137,11 +137,18 @@ parts:
         desktop-launch: bin/
     stage:
       - bin/desktop-launch
-
   
 apps:
   steam:
-    command: usr/bin/fex_launcher.sh
+    command: usr/bin/launch_steam.sh
+    environment:
+      HOME: $SNAP_USER_COMMON
+      LIBGL_DEBUG: verbose
+      TMPDIR: $XDG_RUNTIME_DIR
+      ALWAYS_USE_PULSEAUDIO: 1
+      DISABLE_WAYLAND: 1
+      STEAM_LINUX_RUNTIME_VERBOSE: 1
+      STEAM_LINUX_RUNTIME_LOG: 1
     plugs:
       - shmem
       - desktop
@@ -170,3 +177,19 @@ apps:
       - upower-observe
       - uinput
       - dot-local-share-steam
+  glxgears:
+    command: usr/bin/launch_glxgears.sh
+    environment:
+      LIBGL_DEBUG: verbose
+    plugs:
+      - opengl
+      - x11
+      - desktop
+  vkcube:
+    command: usr/bin/launch_vkcube.sh
+    environment:
+      LIBGL_DEBUG: verbose
+    plugs:
+      - opengl
+      - x11
+      - desktop
