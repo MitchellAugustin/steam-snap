@@ -134,10 +134,6 @@ layout:
     bind-file: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libspirv_to_dxil.a
   /usr/lib/aarch64-linux-gnu/libspirv_to_dxil.so:
     bind-file: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libspirv_to_dxil.so
-  /usr/lib/aarch64-linux-gnu/libstdc++.so.6:
-    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.33
-  /usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.33:
-    bind-file: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.33
   /usr/lib/aarch64-linux-gnu/libva.so.2:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libva.so.2.2000.0
   /usr/lib/aarch64-linux-gnu/libva.so.2.2000.0:
