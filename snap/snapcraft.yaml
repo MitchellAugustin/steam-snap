@@ -62,10 +62,6 @@ layout:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libdrm_amdgpu.so.1.0.0
   /usr/lib/aarch64-linux-gnu/libdrm_amdgpu.so.1.0.0:
     bind-file: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libdrm_amdgpu.so.1.0.0
-  /usr/lib/aarch64-linux-gnu/libdrm.so.2:
-    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libdrm.so.2.4.0
-  /usr/lib/aarch64-linux-gnu/libdrm.so.2.4.0:
-    bind-file: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libdrm.so.2.4.0
   /usr/lib/aarch64-linux-gnu/libEGL_mesa.so.0:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libEGL_mesa.so.0.0.0
   /usr/lib/aarch64-linux-gnu/libEGL_mesa.so.0.0.0:
