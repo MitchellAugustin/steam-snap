@@ -4,6 +4,8 @@ mkdir -p /home/$USER/snap/steam/common/.fex-emu/
 export FEX_SERVERSOCKETPATH=/home/$USER/snap/steam/common/.fex-emu/FEXServer.Socket
 export FEX_APP_CONFIG_LOCATION=/snap/steam/current/fex_config/
 export FEX_ROOTFS=$SNAP_USER_COMMON/x86_rootfs/
+export FEX_THUNKGUESTLIBS=/snap/steam/current/usr/share/fex-emu/GuestThunks/
+export FEX_THUNKHOSTLIBS=/snap/steam/current/usr/lib/aarch64-linux-gnu/fex-emu/HostThunks/
 
 mkdir -p /home/$USER/snap/steam/common/.fex-emu/nvidia_ngx_config
 export FEX_STEAM_NGX_LIB_VERSION_FILE=/home/$USER/snap/steam/common/.fex-emu/nvidia_ngx_config/ngx_lib_version.txt
