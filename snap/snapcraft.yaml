@@ -40,8 +40,6 @@ package-repositories:
 
 layout:
   # Directories that need to be accessible to FEX
-  /usr/lib/x86_64-linux-gnu:
-    bind: $SNAP_USER_COMMON/x86_rootfs/usr/lib/x86_64-linux-gnu
   /usr/lib/aarch64-linux-gnu:
     bind: $SNAP/graphics/usr/lib/aarch64-linux-gnu
   # Make sure FEX can access the libraries it needs
