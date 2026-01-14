@@ -139,6 +139,7 @@ parts:
       - libqt6core6       # Core Qt 6 libraries
       - libqt6widgets6    # If your application uses Qt 6 widgets
       - libstdc++6        # Standard C++ library (often a dependency)
+      - libqt5quick5
   fex-config:
     plugin: dump
     source: ./fex_config
