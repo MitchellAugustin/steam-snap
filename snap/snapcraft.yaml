@@ -7,7 +7,7 @@ description: |
   savegame and screenshot functionality, and many social features.
 adopt-info: steam
 grade: stable
-confinement: strict
+confinement: classic
 base: core24
 platforms:
   arm64:
