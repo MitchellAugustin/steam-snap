@@ -37,6 +37,8 @@ package-repositories:
     key-server: keyserver.ubuntu.com
   - type: apt
     ppa: fex-emu/fex
+  - type: apt
+    ppa: mitchellaugustin/quick-publish-dev-ppa-10-10-25
 
 plugs:
   gaming-graphics-core24:
