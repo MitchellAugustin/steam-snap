@@ -36,7 +36,7 @@ package-repositories:
     key-id: F6ECB3762474EDA9D21B7022871920D1991BC93C
     key-server: keyserver.ubuntu.com
   - type: apt
-    ppa: fex-emu/fex
+    ppa: mitchellaugustin/quick-publish-dev-ppa-10-10-25
 
 plugs:
   gaming-graphics-core24:
