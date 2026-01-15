@@ -38,6 +38,41 @@ package-repositories:
   - type: apt
     ppa: fex-emu/fex
 
+layout:
+  # https://discourse.ubuntu.com/t/the-graphics-core20-snap-interface/23000
+  /usr/share/drirc.d:
+    bind: $SNAP/graphics/usr/share/drirc.d
+  /usr/share/glvnd/egl_vendor.d:
+    bind: $SNAP/graphics/usr/share/glvnd/egl_vendor.d
+  /usr/lib/aarch64-linux-gnu/alsa-lib:
+    bind: $SNAP/usr/lib/aarch64-linux-gnu/alsa-lib
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
+  /usr/share/X11/xkb:
+    bind: $SNAP/usr/share/X11/xkb
+  /usr/lib/aarch64-linux-gnu/libvulkan_intel.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_intel.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_lvp.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_radeon.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_radeon.so
+  /usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0.1.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0
+  /usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so
+  /etc/ld.so.cache:
+    bind-file: $SNAP_DATA/etc/ld.so.cache
+  /etc/fonts:
+    bind: $SNAP/etc/fonts
+
 plugs:
   gaming-graphics-core24:
     interface: content
