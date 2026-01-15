@@ -68,6 +68,22 @@ layout:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0
   /usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so
+  /lib/aarch64-linux-gnu/libvulkan.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1
+  /usr/lib/aarch64-linux-gnu/libvulkan.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1
+  /lib/aarch64-linux-gnu/libvulkan.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1
+  /usr/lib/aarch64-linux-gnu/libvulkan.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1
+  /lib/aarch64-linux-gnu/libGL.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1
+  /usr/lib/aarch64-linux-gnu/libGL.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1
+  /lib/aarch64-linux-gnu/libGL.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1
+  /usr/lib/aarch64-linux-gnu/libGL.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1
   /etc/ld.so.cache:
     bind-file: $SNAP_DATA/etc/ld.so.cache
   /etc/fonts:
