@@ -38,6 +38,115 @@ package-repositories:
   - type: apt
     ppa: fex-emu/fex
 
+# Most of these symlinks are required to get everything visible within
+# the pressure-vessel container.
+# If anything breaks when launching games through s-r-t in the future,
+# use the debug-scripts to help identify which libs are not visible
+# in the environment, and then add a corresponding symlink.
+# We can't explicitly override pressure-vessel's LD_LIBRARY_PATH,
+# but we can ensure that the select .sos that it will pick up are available
+layout:
+  /usr/share/drirc.d:
+    bind: $SNAP/graphics/usr/share/drirc.d
+  /usr/share/glvnd/egl_vendor.d:
+    bind: $SNAP/graphics/usr/share/glvnd/egl_vendor.d
+  /usr/lib/aarch64-linux-gnu/alsa-lib:
+    bind: $SNAP/usr/lib/aarch64-linux-gnu/alsa-lib
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
+  /usr/share/X11/xkb:
+    bind: $SNAP/usr/share/X11/xkb
+  /usr/lib/aarch64-linux-gnu/libvulkan_intel.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_intel.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_radeon.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_radeon.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_broadcom.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_broadcom.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_dzn.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_dzn.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_asahi.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_asahi.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_freedreno.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_freedreno.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_gfxstream.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_gfxstream.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_lvp.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_nouveau.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_nouveau.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_panfrost.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_panfrost.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_virtio.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_virtio.so
+  /usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0.1.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb-dri3.so.0.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0
+  /usr/lib/aarch64-linux-gnu/libxcb.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libxcb.so.1.1.0
+  /usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so
+  /usr/lib/aarch64-linux-gnu/libvulkan.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275
+  /usr/lib/aarch64-linux-gnu/libvulkan.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275
+  /usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275
+  /usr/lib/aarch64-linux-gnu/libGL.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1.7.0
+  /usr/lib/aarch64-linux-gnu/libGL.so.1:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1.7.0
+  /usr/lib/aarch64-linux-gnu/libGL.so.1.7.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1.7.0
+  /usr/lib/aarch64-linux-gnu/libGLX.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLX.so.0.0.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLX_indirect.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLdispatch.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLdispatch.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLdispatch.so.0.0.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLdispatch.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLESv2.so.2:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLESv2.so.2.1.0
+  /usr/lib/aarch64-linux-gnu/libGLESv2.so.2.1.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLESv2.so.2.1.0
+  /usr/lib/libOpenGL.so.0:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libOpenGL.so.0
+  /usr/lib/libX11.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libX11.so.6
+  /usr/lib/libXau.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXau.so.6
+  /usr/lib/libXdmcp.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXdmcp.so.6
+  /usr/lib/libXext.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXext.so.6
+  /usr/lib/aarch64-linux-gnu/libVkLayer_MESA_device_select.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libVkLayer_MESA_device_select.so
+  /usr/lib/aarch64-linux-gnu/libVkLayer_MESA_overlay.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libVkLayer_MESA_overlay.so
+  /usr/share/vulkan:
+    bind: $SNAP/graphics/usr/share/vulkan
+  /etc/ld.so.cache:
+    bind-file: $SNAP_DATA/etc/ld.so.cache
+  /etc/fonts:
+    bind: $SNAP/etc/fonts
+  /usr/share/fex-emu:
+    bind: $SNAP/usr/share/fex-emu
+  /usr/lib/aarch64-linux-gnu/fex-emu:
+    bind: $SNAP/usr/lib/aarch64-linux-gnu/fex-emu
+  /usr/lib/pressure-vessel/overrides/lib/aarch64-linux-gnu/fex-emu:
+    bind: $SNAP/usr/lib/aarch64-linux-gnu/fex-emu
+
 plugs:
   gaming-graphics-core24:
     interface: content
@@ -85,6 +194,12 @@ hooks:
     plugs:
       - opengl
 
+environment:
+  LD_LIBRARY_PATH: $SNAP/graphics/usr/lib/aarch64-linux-gnu:$SNAP/graphics/usr/lib:$SNAP/usr/lib/aarch64-linux-gnu:$SNAP/usr/lib/aarch64-linux-gnu:$SNAP/lib/aarch64-linux-gnu:$SNAP/usr/lib/aarch64-linux-gnu/pulseaudio${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+  LIBGL_DRIVERS_PATH: $SNAP/graphics/usr/lib/aarch64-linux-gnu/dri:$SNAP/graphics/usr/lib/aarch64-linux-gnu/dri:${LIBGL_DRIVERS_PATH:+:$LIBGL_DRIVERS_PATH}
+  GI_TYPELIB_PATH: $SNAP/usr/lib/aarch64-linux-gnu/girepository-1.0
+  PYTHONPATH: $SNAP/usr/lib/python3/dist-packages
+
 parts:
   gaming-graphics-core24:
     plugin: nil
@@ -111,6 +226,37 @@ parts:
       - -usr/share/doc/libcups2t64/changelog.Debian.gz
       - -bin/desktop-launch
       - -usr/share/doc/libavahi-common-data/changelog.Debian.gz
+      - -usr/bin/cpp-13
+      - -usr/bin/fuser
+      - -usr/bin/iceauth
+      - -usr/bin/killall
+      - -usr/bin/lsof
+      - -usr/bin/lspci
+      - -usr/bin/lsusb
+      - -usr/bin/peekfd
+      - -usr/bin/prtstat
+      - -usr/bin/pslog
+      - -usr/bin/pstree
+      - -usr/bin/sessreg
+      - -usr/bin/setpci
+      - -usr/bin/showrgb
+      - -usr/bin/usbhid-dump
+      - -usr/bin/usbreset
+      - -usr/bin/xcmsdb
+      - -usr/bin/xdg-user-dirs-update
+      - -usr/bin/xgamma
+      - -usr/bin/xhost
+      - -usr/bin/xmodmap
+      - -usr/bin/xrandr
+      - -usr/bin/xrdb
+      - -usr/bin/xrefresh
+      - -usr/bin/xset
+      - -usr/bin/xsetmode
+      - -usr/bin/xsetpointer
+      - -usr/bin/xsetroot
+      - -usr/bin/xstdcmap
+      - -usr/bin/xvidtune
+      - -60-steam-input.rules
     organize:
         steam_231_amd64: .
   amd64-rootfs:
@@ -138,6 +284,82 @@ parts:
         desktop-launch: bin/
     stage:
       - bin/desktop-launch
+  steam-devices:
+    plugin: dump
+    source: https://github.com/ValveSoftware/steam-devices.git
+  steam:
+    plugin: nil
+    build-packages:
+      - dpkg-dev
+      - dirmngr # Needed for launchpad builds
+    build-snaps:
+      - core24
+    stage-packages:
+      - libappindicator3-1
+      - libxcb-dri3-0
+      - xkb-data
+      - libpci3
+      - libvulkan1
+      - libxml2
+      - libicu74
+      - zlib1g
+      - xdg-utils
+      - xdg-user-dirs
+      - fontconfig-config
+      - fontconfig
+      - pciutils
+      - lsof
+      - locales-all
+      - usbutils # Allows finding controllers etc
+      - psmisc
+      - libfuse2
+      - libxss1
+      - x11-xserver-utils
+      - libxtst6
+      - libibus-1.0-5
+      - libxrandr2
+      - libxi6
+      - libpipewire-0.3-0t64
+      - libopenal1
+      - libpulse0
+      - libnm0
+      - libglib2.0-0t64
+      - libxfixes3
+      - libgtk2.0-0t64
+      - libxcb-res0
+      - liblzma5
+      - libice6
+      - libsm6
+      - libsdl2-2.0-0
+      - libaom3
+      - libavcodec60
+      - libavutil58
+      - libdav1d7
+      - libswscale7
+      - libvpx9
+    prime:
+      - -usr/include
+      - -usr/share/doc
+      - -usr/share/man
+      - -usr/share/bug
+      - -usr/share/gdb
+      - -usr/share/emacs*
+      - -usr/share/lintian
+      - -usr/share/drirc.d
+      - -usr/share/vulkan
+      - -usr/share/Xsession.d
+      - -usr/lib/*/dri
+      - -usr/lib/*/vdpau
+      - -usr/lib/*/libvkd3d*
+      - -usr/lib/*/libvulkan*
+      - -usr/lib/*/libVk*
+      - -usr/lib/*/libLLVM*
+      - -usr/lib/*/libgallium* # provided by gaming-graphics-core24
+      - -usr/lib/*/libasound.so* # conflicts with alsa-mixin
+    override-prime: |
+      set -eux
+      craftctl default
+      cp -a /snap/core24/current/usr/lib/aarch64-linux-gnu/* usr/lib/aarch64-linux-gnu/
 
   
 apps:
@@ -171,3 +393,4 @@ apps:
       - upower-observe
       - uinput
       - dot-local-share-steam
+
