@@ -39,7 +39,6 @@ package-repositories:
     ppa: fex-emu/fex
 
 layout:
-  # https://discourse.ubuntu.com/t/the-graphics-core20-snap-interface/23000
   /usr/share/drirc.d:
     bind: $SNAP/graphics/usr/share/drirc.d
   /usr/share/glvnd/egl_vendor.d:
@@ -52,12 +51,14 @@ layout:
     bind: $SNAP/usr/share/X11/xkb
   /usr/lib/aarch64-linux-gnu/libvulkan_intel.so:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_intel.so
-  /usr/lib/aarch64-linux-gnu/libvulkan_lvp.so:
-    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_lvp.so
   /usr/lib/aarch64-linux-gnu/libvulkan_radeon.so:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_radeon.so
   /usr/lib/aarch64-linux-gnu/libvulkan_broadcom.so:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_broadcom.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_dzn.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_dzn.so
+  /usr/lib/aarch64-linux-gnu/libvulkan_asahi.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_asahi.so
   /usr/lib/aarch64-linux-gnu/libvulkan_freedreno.so:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan_freedreno.so
   /usr/lib/aarch64-linux-gnu/libvulkan_gfxstream.so:
@@ -83,11 +84,11 @@ layout:
   /usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so
   /usr/lib/aarch64-linux-gnu/libvulkan.so:
-    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.4.328
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275
   /usr/lib/aarch64-linux-gnu/libvulkan.so.1:
-    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.4.328
-  /usr/lib/aarch64-linux-gnu/libvulkan.so.1.4.328:
-    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.4.328
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275
+  /usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libvulkan.so.1.3.275
   /usr/lib/aarch64-linux-gnu/libGL.so:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGL.so.1.7.0
   /usr/lib/aarch64-linux-gnu/libGL.so.1:
@@ -102,10 +103,34 @@ layout:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0
   /usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0:
     symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLX_indirect.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLX_mesa.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLdispatch.so.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLdispatch.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLdispatch.so.0.0.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLdispatch.so.0.0.0
+  /usr/lib/aarch64-linux-gnu/libGLESv2.so.2:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLESv2.so.2.1.0
+  /usr/lib/aarch64-linux-gnu/libGLESv2.so.2.1.0:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libGLESv2.so.2.1.0
+  /usr/lib/libOpenGL.so.0:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libOpenGL.so.0
+  /usr/lib/libX11.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libX11.so.6
+  /usr/lib/libXau.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXau.so.6
+  /usr/lib/libXdmcp.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXdmcp.so.6
   /etc/ld.so.cache:
     bind-file: $SNAP_DATA/etc/ld.so.cache
   /etc/fonts:
     bind: $SNAP/etc/fonts
+  /usr/share/fex-emu:
+    bind: $SNAP/usr/share/fex-emu
+  /usr/lib/aarch64-linux-gnu/fex-emu:
+    bind: $SNAP/usr/lib/aarch64-linux-gnu/fex-emu
+  /usr/lib/pressure-vessel/overrides/lib/aarch64-linux-gnu/fex-emu:
+    bind: $SNAP/usr/lib/aarch64-linux-gnu/fex-emu
 
 plugs:
   gaming-graphics-core24:
