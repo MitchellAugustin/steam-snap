@@ -110,7 +110,13 @@ if [ "$(cat "$FEX_STEAM_NGX_LIB_VERSION_FILE" 2>/dev/null || true)" != "$nvidia_
 	echo $nvidia_driver_version > $FEX_STEAM_NGX_LIB_VERSION_FILE
 fi
 
+# Make FEX thunk libraries visible to pressure-vessel containers
+# Also expose hostfs paths for Vulkan ICDs and graphics drivers that the snap can access
+export PRESSURE_VESSEL_FILESYSTEMS_RO="/snap/steam/current/usr/share/fex-emu:/snap/steam/current/usr/lib/aarch64-linux-gnu/fex-emu:/var/lib/snapd/hostfs:/var/lib/snapd/lib"
 
-
+# Enable library loading debug
+#export LD_DEBUG=libs,files
+#export LD_DEBUG_OUTPUT=$SNAP_USER_COMMON/ld-debug
 
 /snap/steam/current/usr/bin/FEXBash /snap/steam/current/bin/desktop-launch
+
