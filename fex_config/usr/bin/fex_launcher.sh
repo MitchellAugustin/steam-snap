@@ -114,6 +114,15 @@ fi
 # Also expose hostfs paths for Vulkan ICDs and graphics drivers that the snap can access
 export PRESSURE_VESSEL_FILESYSTEMS_RO="/snap/steam/current/usr/share/fex-emu:/snap/steam/current/usr/lib/aarch64-linux-gnu/fex-emu:/var/lib/snapd/hostfs:/var/lib/snapd/lib"
 
+# Prepend host's ARM64 library paths so FEX thunking can find native drivers
+export LD_LIBRARY_PATH="/var/lib/snapd/hostfs/usr/lib/aarch64-linux-gnu:${LD_LIBRARY_PATH}"
+export PRESSURE_VESSEL_APP_LD_LIBRARY_PATH="/var/lib/snapd/hostfs/usr/lib/aarch64-linux-gnu:${LD_LIBRARY_PATH}"
+# Add host's ARM64 library paths for FEX thunking via Steam Runtime variable
+# This gets picked up by pressure-vessel and added to LD_LIBRARY_PATH inside the container
+export STEAM_RUNTIME_LIBRARY_PATH="/var/lib/snapd/hostfs/usr/lib/aarch64-linux-gnu${STEAM_RUNTIME_LIBRARY_PATH:+:}${STEAM_RUNTIME_LIBRARY_PATH}"
+export STEAM_COMPAT_LIBRARY_PATHS="/var/lib/snapd/hostfs/usr/lib/aarch64-linux-gnu${STEAM_COMPAT_LIBRARY_PATHS:+:}${STEAM_COMPAT_LIBRARY_PATHS}"
+
+
 # Enable library loading debug
 #export LD_DEBUG=libs,files
 #export LD_DEBUG_OUTPUT=$SNAP_USER_COMMON/ld-debug

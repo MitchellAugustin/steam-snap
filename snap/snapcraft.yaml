@@ -121,6 +121,12 @@ layout:
     symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXau.so.6
   /usr/lib/libXdmcp.so.6:
     symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXdmcp.so.6
+  /usr/lib/libXext.so.6:
+    symlink: $SNAP/usr/lib/aarch64-linux-gnu/libXext.so.6
+  /usr/lib/aarch64-linux-gnu/libVkLayer_MESA_device_select.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libVkLayer_MESA_device_select.so
+  /usr/lib/aarch64-linux-gnu/libVkLayer_MESA_overlay.so:
+    symlink: $SNAP/graphics/usr/lib/aarch64-linux-gnu/libVkLayer_MESA_overlay.so
   /usr/share/vulkan:
     bind: $SNAP/graphics/usr/share/vulkan
   /etc/ld.so.cache:

@@ -6,6 +6,10 @@
 # shellcheck disable=SC2034
 START=$(date +%s.%N)
 
+# Prepend host ARM64 library path for FEX thunking to work with native drivers
+# This needs to be at the very top so it's available when pressure-vessel loads
+export LD_LIBRARY_PATH="/var/lib/snapd/hostfs/usr/lib/aarch64-linux-gnu${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
+
 if ! snapctl is-connected "gaming-graphics-core24"; then
   echo "ERROR: not connected to the gaming-mesa content interface."
   echo "To connect:"
