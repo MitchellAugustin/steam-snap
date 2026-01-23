@@ -8,7 +8,6 @@ sudo snap connect steam:network-control
 sudo snap connect steam:dot-local-share-applications
 sudo snap connect steam:dot-local-share-icons
 sudo snap connect steam:dot-local-share-steam
-sudo snap connect steam:user-fex-config
 sudo snap connect steam:process-control
 sudo snap connect steam:removable-media
 sudo snap connect steam:steam-support
