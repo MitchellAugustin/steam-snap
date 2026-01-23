@@ -110,6 +110,7 @@ parts:
       - -usr/libexec/dconf-service
       - -usr/share/doc/libcups2t64/changelog.Debian.gz
       - -bin/desktop-launch
+      - -usr/share/doc/libavahi-common-data/changelog.Debian.gz
     organize:
         steam_231_amd64: .
   amd64-rootfs:
