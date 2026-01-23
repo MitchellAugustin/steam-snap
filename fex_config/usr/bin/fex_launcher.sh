@@ -1,17 +1,17 @@
 #!/bin/bash
-mkdir -p /home/$USER/snap/steam/common/.fex-emu/
+mkdir -p $SNAP_USER_COMMON/.fex-emu/
 #mkdir -p /home/$USER/.fex-emu/
-export FEX_SERVERSOCKETPATH=/home/$USER/snap/steam/common/.fex-emu/FEXServer.Socket
-export FEX_APP_CONFIG_LOCATION=/snap/steam/current/fex_config/
+export FEX_SERVERSOCKETPATH=$SNAP_USER_COMMON/.fex-emu/FEXServer.Socket
+export FEX_APP_CONFIG_LOCATION=$SNAP/fex_config/
 export FEX_ROOTFS=$SNAP_USER_COMMON/x86_rootfs/
 
-mkdir -p /home/$USER/snap/steam/common/.fex-emu/nvidia_ngx_config
-export FEX_STEAM_NGX_LIB_VERSION_FILE=/home/$USER/snap/steam/common/.fex-emu/nvidia_ngx_config/ngx_lib_version.txt
+mkdir -p $SNAP_USER_COMMON/.fex-emu/nvidia_ngx_config
+export FEX_STEAM_NGX_LIB_VERSION_FILE=$SNAP_USER_COMMON/.fex-emu/nvidia_ngx_config/ngx_lib_version.txt
 touch $FEX_STEAM_NGX_LIB_VERSION_FILE
 
 # Refresh the rootfs from the snap if it mismatches (except the nvidia parts, which we expect to mismatch
 # due to the copied NGX DLL)
-SNAP_ROOTFS_HASH="$(sha256sum /snap/steam/current/x86_rootfs.tar.gz | cut -d ' ' -f 1)"
+SNAP_ROOTFS_HASH="$(sha256sum $SNAP/x86_rootfs.tar.gz | cut -d ' ' -f 1)"
 HOME_ROOTFS_HASH="$(sha256sum $SNAP_USER_COMMON/x86_rootfs.tar.gz | cut -d ' ' -f 1)"
 
 if [ "$SNAP_ROOTFS_HASH" != "$HOME_ROOTFS_HASH" ]; then
@@ -19,7 +19,7 @@ if [ "$SNAP_ROOTFS_HASH" != "$HOME_ROOTFS_HASH" ]; then
 	echo "Refreshing rootfs - difference detected"
 	echo "SNAP_ROOFTS: $SNAP_ROOTFS_HASH"
 	echo "HOME_ROOTFS: $HOME_ROOTFS_HASH"
-	cp -f /snap/steam/current/x86_rootfs.tar.gz $SNAP_USER_COMMON
+	cp -f $SNAP/x86_rootfs.tar.gz $SNAP_USER_COMMON
 	rm -rf $SNAP_USER_COMMON/x86_rootfs
 	tar -xvf $SNAP_USER_COMMON/x86_rootfs.tar.gz -C $SNAP_USER_COMMON
 	echo "" > $FEX_STEAM_NGX_LIB_VERSION_FILE
@@ -53,14 +53,14 @@ if [ "$(cat "$FEX_STEAM_NGX_LIB_VERSION_FILE" 2>/dev/null || true)" != "$nvidia_
 	echo "Working in temporary directory: $TEMP_DIR"
 
 	nvidia_driver_version=$(cat /sys/module/nvidia/version)
-	/snap/steam/current/usr/bin/wget https://download.nvidia.com/XFree86/Linux-x86_64/$nvidia_driver_version/NVIDIA-Linux-x86_64-$nvidia_driver_version.run
+	$SNAP/usr/bin/wget https://download.nvidia.com/XFree86/Linux-x86_64/$nvidia_driver_version/NVIDIA-Linux-x86_64-$nvidia_driver_version.run
 
 	rootfs="$FEX_ROOTFS"
 	 
 	runfile=$(realpath ./NVIDIA-Linux-x86_64-$nvidia_driver_version.run)
 	runfilename=$(basename $runfile)
 	 
-	/snap/steam/current/usr/bin/FEXBash "$runfile -x" # || return -1
+	$SNAP/usr/bin/FEXBash "$runfile -x" # || return -1
 
 	pushd . >/dev/null
 	cd ${runfilename%.run}
@@ -113,4 +113,4 @@ fi
 
 
 
-/snap/steam/current/usr/bin/FEXBash /snap/steam/current/bin/desktop-launch
+$SNAP/usr/bin/FEXBash $SNAP/bin/desktop-launch
