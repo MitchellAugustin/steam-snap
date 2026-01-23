@@ -257,6 +257,7 @@ parts:
       - -usr/bin/xstdcmap
       - -usr/bin/xvidtune
       - -60-steam-input.rules
+      - -60-steam-vr.rules
     organize:
         steam_231_amd64: .
   amd64-rootfs:
