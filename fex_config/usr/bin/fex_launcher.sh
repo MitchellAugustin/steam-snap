@@ -108,6 +108,7 @@ if [ "$(cat "$FEX_STEAM_NGX_LIB_VERSION_FILE" 2>/dev/null || true)" != "$nvidia_
 	chmod +r $rootfs/usr/lib/x86_64-linux-gnu/nvidia/wine/*
 
 	echo $nvidia_driver_version > $FEX_STEAM_NGX_LIB_VERSION_FILE
+	cp /var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json $rootfs/usr/share/vulkan/icd.d/nvidia_icd.json
 fi
 
 # Make FEX thunk libraries visible to pressure-vessel containers
