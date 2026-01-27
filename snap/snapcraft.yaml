@@ -249,6 +249,8 @@ parts:
       - -usr/bin/xstdcmap
       - -usr/bin/xvidtune
       - -60-steam-input.rules
+      - -60-steam-vr.rules
+      - -usr/share/doc/libavahi-common-data/changelog.Debian.gz
     organize:
         steam_231_amd64: .
   amd64-rootfs:
