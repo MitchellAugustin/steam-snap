@@ -2,7 +2,7 @@
 mkdir -p $SNAP_USER_COMMON/.fex-emu/
 #mkdir -p /home/$USER/.fex-emu/
 export FEX_SERVERSOCKETPATH=$SNAP_USER_COMMON/.fex-emu/FEXServer.Socket
-export FEX_APP_CONFIG_LOCATION=$SNAP/fex_config/
+export FEX_APP_CONFIG_LOCATION=$SNAP_USER_COMMON/fex_config/
 export FEX_ROOTFS=$SNAP_USER_COMMON/x86_rootfs/
 
 mkdir -p $SNAP_USER_COMMON/.fex-emu/nvidia_ngx_config
@@ -23,6 +23,7 @@ if [ "$SNAP_ROOTFS_HASH" != "$HOME_ROOTFS_HASH" ]; then
 	rm -rf $SNAP_USER_COMMON/x86_rootfs
 	tar -xvf $SNAP_USER_COMMON/x86_rootfs.tar.gz -C $SNAP_USER_COMMON
 	echo "" > $FEX_STEAM_NGX_LIB_VERSION_FILE
+	rm $SNAP_USER_COMMON/prefer_custom_user_config # Also ask the user again if they want to update their config, if it differs
 fi
 
 nvidia_driver_version=$(cat /sys/module/nvidia/version 2>/dev/null || true)
@@ -110,6 +111,28 @@ if [ "$(cat "$FEX_STEAM_NGX_LIB_VERSION_FILE" 2>/dev/null || true)" != "$nvidia_
 	echo $nvidia_driver_version > $FEX_STEAM_NGX_LIB_VERSION_FILE
 	cp /var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json $rootfs/usr/share/vulkan/icd.d/nvidia_icd.json
 fi
+
+# Copy Config.json if it differs. (If it doesn't yet exist, don't prompt - just copy) 
+if [ -d $FEX_APP_CONFIG_LOCATION ]; then
+	echo "Your local FEX configuration differs from the latest version provided by the Steam snap. This can happen if, for example, you enabled thunking or other features. Would you like to update your config to the snap-provided config? Diff below: " > $SNAP_USER_COMMON/user_config_diff.txt
+	diff -ruN $FEX_APP_CONFIG_LOCATION $SNAP/fex_config >> $SNAP_USER_COMMON/user_config_diff.txt
+	if ! diff -ruN "$FEX_APP_CONFIG_LOCATION" "$SNAP/fex_config" > /dev/null && [[ ! -f "$SNAP_USER_COMMON/prefer_custom_user_config" ]]; then
+		echo "Configs differ!"
+		if zenity --text-info --title="Use config from latest update?" --filename="$SNAP_USER_COMMON/user_config_diff.txt" --ok-label="Use default config" --cancel-label="Use my config" --width=640 --height=480; then
+			# Use default config selected
+			rm -r "$FEX_APP_CONFIG_LOCATION"
+			cp -r "$SNAP/fex_config" "$FEX_APP_CONFIG_LOCATION"
+		else
+			# Keep user config
+			touch "$SNAP_USER_COMMON/prefer_custom_user_config"
+		fi
+	fi
+else
+	echo "Copying default FEX config to $SNAP/fex_config"
+	cp -r $SNAP/fex_config $FEX_APP_CONFIG_LOCATION
+fi
+
+	
 
 # Make FEX thunk libraries visible to pressure-vessel containers
 # Also expose hostfs paths for Vulkan ICDs and graphics drivers that the snap can access
