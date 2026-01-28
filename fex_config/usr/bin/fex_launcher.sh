@@ -128,7 +128,7 @@ if [ -d $FEX_APP_CONFIG_LOCATION ]; then
 		fi
 	fi
 else
-	echo "Copying default FEX config to $SNAP/fex_config"
+	echo "Copying default FEX config to $FEX_APP_CONFIG_LOCATION"
 	cp -r $SNAP/fex_config $FEX_APP_CONFIG_LOCATION
 fi
 
