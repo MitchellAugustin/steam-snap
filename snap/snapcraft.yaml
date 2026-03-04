@@ -263,7 +263,7 @@ parts:
         steam_231_amd64: .
   amd64-rootfs:
     plugin: dump
-    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-3-3-26/amd64_rootfs.tar.gz
+    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-3-3-26-2/amd64_rootfs.tar.gz
     organize:
         amd64_rootfs: .
   fex-emu:
