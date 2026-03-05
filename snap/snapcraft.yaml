@@ -15,7 +15,7 @@ platforms:
     build-for: [arm64]
 compression: lzo
 assumes:
-  - snapd2.62
+  - snapd2.73
 
 lint:
   # Snapcraft's `ldd` lint can't handle 32-bit things,

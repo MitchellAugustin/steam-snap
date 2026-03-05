@@ -16,3 +16,4 @@ sudo snap connect steam:uinput
 sudo snap connect steam:network-observe
 sudo snap connect steam:gaming-graphics-core24 gaming-graphics-core24
 sudo snap connections steam
+snap set system snapshots.automatic.retention=no # automatic snapshot is time consuming and not useful for debugging purposes
