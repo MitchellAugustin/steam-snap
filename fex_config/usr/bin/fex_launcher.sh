@@ -1,4 +1,25 @@
 #!/bin/bash
+
+custom_nvdriver_url=""
+desktop_launch_args=()
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		--nvdriver)
+			if [[ -z "$2" ]]; then
+				echo "Error: --nvdriver requires a URL argument" >&2
+				exit 1
+			fi
+			custom_nvdriver_url="$2"
+			shift 2
+			;;
+		*)
+			desktop_launch_args+=("$1")
+			shift
+			;;
+	esac
+done
+
 mkdir -p $SNAP_USER_COMMON/.fex-emu/
 #mkdir -p /home/$USER/.fex-emu/
 export FEX_SERVERSOCKETPATH=$SNAP_USER_COMMON/.fex-emu/FEXServer.Socket
@@ -54,13 +75,22 @@ if [ "$(cat "$FEX_STEAM_NGX_LIB_VERSION_FILE" 2>/dev/null || true)" != "$nvidia_
 	echo "Working in temporary directory: $TEMP_DIR"
 
 	nvidia_driver_version=$(cat /sys/module/nvidia/version)
-	$SNAP/usr/bin/wget https://download.nvidia.com/XFree86/Linux-x86_64/$nvidia_driver_version/NVIDIA-Linux-x86_64-$nvidia_driver_version.run
+	nvidia_runfile_url="https://download.nvidia.com/XFree86/Linux-x86_64/$nvidia_driver_version/NVIDIA-Linux-x86_64-$nvidia_driver_version.run"
+	if [[ -n "$custom_nvdriver_url" ]]; then
+		nvidia_runfile_url="$custom_nvdriver_url"
+	fi
+	nvidia_runfile_name="$(basename "${nvidia_runfile_url%%\?*}")"
+	if [[ -z "$nvidia_runfile_name" || "$nvidia_runfile_name" == "/" || "$nvidia_runfile_name" == "." ]]; then
+		echo "Error: could not determine NVIDIA runfile name from URL: $nvidia_runfile_url" >&2
+		exit 1
+	fi
+	$SNAP/usr/bin/wget -O "$nvidia_runfile_name" "$nvidia_runfile_url"
 
 	rootfs="$FEX_ROOTFS"
-	 
-	runfile=$(realpath ./NVIDIA-Linux-x86_64-$nvidia_driver_version.run)
+
+	runfile=$(realpath "./$nvidia_runfile_name")
 	runfilename=$(basename $runfile)
-	 
+
 	$SNAP/usr/bin/FEXBash "$runfile -x" # || return -1
 
 	pushd . >/dev/null
@@ -142,4 +172,4 @@ export PRESSURE_VESSEL_FILESYSTEMS_RO="/snap/steam/current/usr/share/fex-emu:/sn
 #export LD_DEBUG=libs,files
 #export LD_DEBUG_OUTPUT=$SNAP_USER_COMMON/ld-debug
 
-$SNAP/usr/bin/FEXBash $SNAP/bin/desktop-launch
+$SNAP/usr/bin/FEXBash $SNAP/bin/desktop-launch "${desktop_launch_args[@]}"
