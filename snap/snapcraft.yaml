@@ -31,6 +31,15 @@ package-repositories:
     components: [steam]
     architectures: [amd64, i386]
     key-id: BA1816EF8E75005FCF5E27A1F24AEA9FB05498B7
+  - type: apt
+    url: http://archive.ubuntu.com/ubuntu/
+    suites: [noble, noble-updates]
+    components: [main, universe]
+    architectures: [amd64, i386]
+    key-id: F6ECB3762474EDA9D21B7022871920D1991BC93C
+    key-server: keyserver.ubuntu.com
+  - type: apt
+    ppa: 3v1n0/gamescope
 
 layout:
   /usr/lib/steam:
@@ -313,6 +322,40 @@ parts:
       - -usr/share/doc/mangohud/MangoHud.conf.example
       - -usr/share/man/man1/mangohud.1
 
+  gamescope:
+    plugin: nil
+    stage-packages:
+      - libxres-dev
+      - libxres1
+      - gamescope
+    organize:
+      usr/games/gamescope: usr/bin/gamescope
+      usr/games/gamescopectl: usr/bin/gamescopectl
+      usr/games/gamescopereaper: usr/bin/gamescopereaper
+      usr/games/gamescopestream: usr/bin/gamescopestream
+      usr/lib/x86_64-linux-gnu/libXRes.so.1: usr/lib/x86_64-linux-gnu/libXRes.so.1
+    stage:
+      - usr/bin/gamescope
+      - usr/bin/gamescopectl
+      - usr/bin/gamescopereaper
+      - usr/bin/gamescopestream
+      - usr/share/gamescope
+      - usr/lib/x86_64-linux-gnu/gamescope/libVkLayer_FROG_gamescope_wsi_x86_64.so
+      - usr/lib/x86_64-linux-gnu/libXRes.so.1
+      - -usr/lib/x86_64-linux-gnu/libpixman-1.so.0
+      - -usr/lib/x86_64-linux-gnu/libwayland-client.so.0
+      - -usr/lib/x86_64-linux-gnu/libwayland-cursor.so.0
+      - -usr/lib/x86_64-linux-gnu/libwayland-egl.so.1
+      - -usr/share/doc/libpixman-1-0/changelog.Debian.gz
+      - -usr/share/doc/libpixman-1-0/copyright
+      - -usr/share/doc/libwayland-client0/changelog.Debian.gz
+      - -usr/share/doc/libwayland-client0/copyright
+      - -usr/share/doc/libwayland-cursor0/changelog.Debian.gz
+      - -usr/share/doc/libwayland-cursor0/copyright
+      - -usr/share/doc/libwayland-egl1/changelog.Debian.gz
+      - -usr/share/doc/libwayland-egl1/copyright
+
+
   gamemode:
     after: [meson-deps]
     source: https://github.com/FeralInteractive/gamemode.git
@@ -382,6 +425,10 @@ parts:
       - dirmngr # Needed for launchpad builds
     build-snaps:
       - core24
+    stage:
+      - -usr/lib/x86_64-linux-gnu/libwayland-cursor.so.0
+      - -usr/share/doc/libwayland-cursor0/changelog.Debian.gz
+      - -usr/share/doc/libwayland-cursor0/copyright
     stage-packages:
       - steam-launcher
       - steam-libs-amd64
