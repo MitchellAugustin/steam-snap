@@ -81,6 +81,10 @@ layout:
     symlink: $SNAP/graphics/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0
   /usr/lib/x86_64-linux-gnu/gbm/dri_gbm.so:
     symlink: $SNAP/graphics/usr/lib/x86_64-linux-gnu/gbm/dri_gbm.so
+  /usr/lib/x86_64-linux-gnu/libXRes.so.1:
+    symlink: $SNAP/usr/lib/x86_64-linux-gnu/libXRes.so.1
+  /usr/lib/x86_64-linux-gnu/libXRes.so.1.0.0:
+    symlink: $SNAP/usr/lib/x86_64-linux-gnu/libXRes.so.1.0.0
   /etc/ld.so.cache:
     bind-file: $SNAP_DATA/etc/ld.so.cache
   /etc/fonts:
@@ -327,6 +331,13 @@ parts:
     stage-packages:
       - libxres-dev
       - libxres1
+      - libwlroots-0.18
+      - libwlroots-0.18-dev
+      - libliftoff0
+      - libliftoff-dev
+      - libdisplay-info1
+      - libwayland-server0
+      - libwayland-server++1
       - gamescope
     organize:
       usr/games/gamescope: usr/bin/gamescope
@@ -342,6 +353,11 @@ parts:
       - usr/share/gamescope
       - usr/lib/x86_64-linux-gnu/gamescope/libVkLayer_FROG_gamescope_wsi_x86_64.so
       - usr/lib/x86_64-linux-gnu/libXRes.so.1
+      - usr/lib/x86_64-linux-gnu/libXRes.so.1.0.0
+      - usr/lib/x86_64-linux-gnu/libwayland-server*
+      - usr/lib/x86_64-linux-gnu/libwlroots*
+      - usr/lib/x86_64-linux-gnu/libliftoff*
+      - usr/lib/x86_64-linux-gnu/libdisplay-info*
       - -usr/lib/x86_64-linux-gnu/libpixman-1.so.0
       - -usr/lib/x86_64-linux-gnu/libwayland-client.so.0
       - -usr/lib/x86_64-linux-gnu/libwayland-cursor.so.0
