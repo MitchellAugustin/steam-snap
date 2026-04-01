@@ -31,15 +31,6 @@ package-repositories:
     components: [steam]
     architectures: [amd64, i386]
     key-id: BA1816EF8E75005FCF5E27A1F24AEA9FB05498B7
-  - type: apt
-    url: http://archive.ubuntu.com/ubuntu/
-    suites: [noble, noble-updates]
-    components: [main, universe]
-    architectures: [amd64, i386]
-    key-id: F6ECB3762474EDA9D21B7022871920D1991BC93C
-    key-server: keyserver.ubuntu.com
-  - type: apt
-    ppa: 3v1n0/gamescope
 
 layout:
   /usr/lib/steam:
@@ -327,50 +318,82 @@ parts:
       - -usr/share/man/man1/mangohud.1
 
   gamescope:
-    plugin: nil
-    stage-packages:
+    after: [meson-deps]
+    source: https://github.com/ValveSoftware/gamescope.git
+    source-tag: "3.14.2" # Or a version compatible with your PPA
+    source-depth: 1
+    source-submodules:
+      - subprojects/wlroots
+      - subprojects/libliftoff
+      - subprojects/vkroots
+      - subprojects/vulkan-headers
+      - src/reshade
+      - thirdparty/SPIRV-Headers
+      - subprojects/libdisplay-info
+      - subprojects/openvr
+    plugin: meson
+    meson-parameters:
+      - --prefix=/usr
+      - -Dforce_fallback_for=wlroots,libliftoff,vkroots,vulkan-headers
+      - -Dpipewire=enabled
+    build-packages:
+      - cmake
+      - wayland-protocols
       - libxres-dev
+      - libwayland-dev
+      - libvulkan-dev
+      - libx11-xcb-dev
+      - libxkbcommon-dev
+      - libgbm-dev
+      - libdrm-dev
+      - libinput-dev
+      - libseat-dev
+      - libavif-dev
+      - libeis-dev
+      - libxcb-composite0-dev
+      - libxcb-ewmh-dev
+      - libxcb-icccm4-dev
+      - libxcb-res0-dev
+      - libluajit-5.1-dev
+      - libcap-dev
+      - libpipewire-0.3-dev
+      - libxdamage-dev
+      - libxrender-dev
+      - libxext-dev
+      - libxfixes-dev
+      - libxxf86vm-dev
+      - libxtst-dev
+      - libxmu-dev
+      - libxi-dev
+      - libxcb-xinput-dev
+      - libxcb-render-util0-dev
+      - libpixman-1-dev
+      - libdecor-0-dev
+      - libsdl2-dev
+      - libudev-dev
+      - libsystemd-dev
+      - hwdata
+      - glslang-tools
+      - libglm-dev
+      - libstb-dev
+      - pkg-config
+      - g++
+      - git
+      - libxcomposite-dev
+      - xwayland
+    stage-packages:
       - libxres1
-      - libwlroots-0.18
-      - libwlroots-0.18-dev
-      - libliftoff0
-      - libliftoff-dev
-      - libdisplay-info1
+      - libeis1
+      - libluajit-5.1-2
+      - libavif16
       - libwayland-server0
-      - libwayland-server++1
-      - gamescope
+      - libseat1
+      - libinput10
     organize:
       usr/games/gamescope: usr/bin/gamescope
-      usr/games/gamescopectl: usr/bin/gamescopectl
-      usr/games/gamescopereaper: usr/bin/gamescopereaper
-      usr/games/gamescopestream: usr/bin/gamescopestream
-      usr/lib/x86_64-linux-gnu/libXRes.so.1: usr/lib/x86_64-linux-gnu/libXRes.so.1
     stage:
-      - usr/bin/gamescope
-      - usr/bin/gamescopectl
-      - usr/bin/gamescopereaper
-      - usr/bin/gamescopestream
-      - usr/share/gamescope
-      - usr/lib/x86_64-linux-gnu/gamescope/libVkLayer_FROG_gamescope_wsi_x86_64.so
-      - usr/lib/x86_64-linux-gnu/libXRes.so.1
-      - usr/lib/x86_64-linux-gnu/libXRes.so.1.0.0
-      - usr/lib/x86_64-linux-gnu/libwayland-server*
-      - usr/lib/x86_64-linux-gnu/libwlroots*
-      - usr/lib/x86_64-linux-gnu/libliftoff*
-      - usr/lib/x86_64-linux-gnu/libdisplay-info*
-      - -usr/lib/x86_64-linux-gnu/libpixman-1.so.0
-      - -usr/lib/x86_64-linux-gnu/libwayland-client.so.0
-      - -usr/lib/x86_64-linux-gnu/libwayland-cursor.so.0
-      - -usr/lib/x86_64-linux-gnu/libwayland-egl.so.1
-      - -usr/share/doc/libpixman-1-0/changelog.Debian.gz
-      - -usr/share/doc/libpixman-1-0/copyright
-      - -usr/share/doc/libwayland-client0/changelog.Debian.gz
-      - -usr/share/doc/libwayland-client0/copyright
-      - -usr/share/doc/libwayland-cursor0/changelog.Debian.gz
-      - -usr/share/doc/libwayland-cursor0/copyright
-      - -usr/share/doc/libwayland-egl1/changelog.Debian.gz
-      - -usr/share/doc/libwayland-egl1/copyright
-
+      - usr/bin/gamescope*
+      - usr/lib/x86_64-linux-gnu/lib*.so*
 
   gamemode:
     after: [meson-deps]
