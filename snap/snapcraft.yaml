@@ -323,7 +323,13 @@ parts:
     after: [meson-deps]
     source: https://github.com/ValveSoftware/gamescope.git
     source-tag: "3.14.2" # FTBFS due to wayland-server >=1.23 being needed. 3.14.2 builds.
-    source-depth: 1
+    source-depth: 2
+    override-build: |
+      # Patch EVERY file in the current directory and all subdirectories (subprojects)
+      # We change /tmp/.X11-unix to a path Snapcraft ALLOWS: /tmp/snap.$CRAFT_PROJECT_NAME/x11
+      # Note: Snaps are allowed to write to /tmp/snap.<name> via the base template
+      grep -rl '/tmp/.X11-unix' subprojects/wlroots | xargs sed -i "s|/tmp/.X11-unix|/tmp/snap.$CRAFT_PROJECT_NAME/x11|g"
+      snapcraftctl build
     source-submodules:
       - subprojects/wlroots
       - subprojects/libliftoff
@@ -397,6 +403,7 @@ parts:
     stage:
       - usr/bin/gamescope*
       - usr/lib/x86_64-linux-gnu/lib*.so*
+      - usr/bin/Xwayland
 
   gamemode:
     after: [meson-deps]
@@ -632,6 +639,7 @@ apps:
       XWININFO: $SNAP/usr/bin/xwininfo
       # Xwayland often needs these to initialize correctly
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      X11_UNIX_SOCKET_DIR: $XDG_RUNTIME_DIR/X11-unix
     plugs:
       - shmem
       - camera
