@@ -390,8 +390,8 @@ strip_unreachable_dirs XDG_SPECIAL_DIRS
 export APPIMAGE_EXTRACT_AND_RUN=1
 
 # Required for gamescope
-mkdir -p "$XDG_RUNTIME_DIR/x11-unix"
-chmod 1777 "$XDG_RUNTIME_DIR/x11-unix"
+mkdir -p "/tmp/steam-snap-x11"
+chmod 1777 "/tmp/steam-snap-x11"
 
 $SNAP/bin/nvidia32 &
 "$@"

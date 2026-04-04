@@ -82,6 +82,8 @@ layout:
     bind-file: $SNAP_DATA/etc/ld.so.cache
   /etc/fonts:
     bind: $SNAP/etc/fonts
+  /usr/bin/xkbcomp:
+    symlink: $SNAP/usr/bin/xkbcomp
 
 plugs:
   gaming-graphics-core24:
@@ -321,15 +323,9 @@ parts:
 
   gamescope:
     after: [meson-deps]
-    source: https://github.com/ValveSoftware/gamescope.git
-    source-tag: "3.14.2" # FTBFS due to wayland-server >=1.23 being needed. 3.14.2 builds.
-    source-depth: 2
-    override-build: |
-      # Patch EVERY file in the current directory and all subdirectories (subprojects)
-      # We change /tmp/.X11-unix to a path Snapcraft ALLOWS: /tmp/snap.$CRAFT_PROJECT_NAME/x11
-      # Note: Snaps are allowed to write to /tmp/snap.<name> via the base template
-      grep -rl '/tmp/.X11-unix' subprojects/wlroots | xargs sed -i "s|/tmp/.X11-unix|/tmp/snap.$CRAFT_PROJECT_NAME/x11|g"
-      snapcraftctl build
+    source: https://github.com/MitchellAugustin/gamescope.git # Custom fork required since wlroots hard-codes a directory that the snap can't access
+    source-branch: "3.14.2-steamsnap" # Latest version FTBFS due to wayland-server >=1.23 being needed. 3.14.2 builds.
+    source-depth: 1
     source-submodules:
       - subprojects/wlroots
       - subprojects/libliftoff
@@ -398,10 +394,16 @@ parts:
       - libseat1
       - libinput10
       - xwayland
+      - xkb-data
+      - x11-xkb-utils
+      - libgbm1
+      - libgbm-dev
     organize:
       usr/games/gamescope: usr/bin/gamescope
     stage:
       - usr/bin/gamescope*
+      - usr/bin/xkb*
+      - usr/bin/setxkbmap
       - usr/lib/x86_64-linux-gnu/lib*.so*
       - usr/bin/Xwayland
 
