@@ -120,6 +120,11 @@ plugs:
   shmem:
     interface: shared-memory
     private: true
+  x11-socket-dir:
+    interface: system-files
+    write:
+      - /tmp/.X11-unix
+
 
 slots:
   steam:
@@ -323,8 +328,8 @@ parts:
 
   gamescope:
     after: [meson-deps]
-    source: https://github.com/MitchellAugustin/gamescope.git # Custom fork required since wlroots hard-codes a directory that the snap can't access
-    source-branch: "3.14.2-steamsnap" # Latest version FTBFS due to wayland-server >=1.23 being needed. 3.14.2 builds.
+    source: https://github.com/ValveSoftware/gamescope.git
+    source-branch: "3.14.2" # Latest version FTBFS due to wayland-server >=1.23 being needed. 3.14.2 builds.
     source-depth: 1
     source-submodules:
       - subprojects/wlroots
