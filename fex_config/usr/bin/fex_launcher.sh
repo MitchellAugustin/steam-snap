@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Refuse to launch if the kernel has a 64k page size
+PAGE_SIZE=$(getconf PAGESIZE)
+
+if [ "$PAGE_SIZE" -eq 4096 ]; then
+    echo "Confirmed: Running a 4k page size kernel."
+else
+    echo "Unsupported page size: $PAGE_SIZE bytes."
+    zenity --info --text="This application requires a 4k page size kernel. If your hardware supports a 4k page-size kernel, please install and boot that kernel and re-launch." --title="Kernel page size not supported"
+    exit 1
+fi
+
 custom_nvdriver_url=""
 desktop_launch_args=()
 
