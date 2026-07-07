@@ -102,7 +102,7 @@ if [ "$(cat "$FEX_STEAM_NGX_LIB_VERSION_FILE" 2>/dev/null || true)" != "$nvidia_
 	runfile=$(realpath "./$nvidia_runfile_name")
 	runfilename=$(basename $runfile)
 
-	$SNAP/usr/bin/FEXBash "$runfile -x" # || return -1
+	$SNAP/usr/bin/FEXBash -c "$runfile -x" # || return -1
 
 	pushd . >/dev/null
 	cd ${runfilename%.run}
@@ -183,4 +183,4 @@ export PRESSURE_VESSEL_FILESYSTEMS_RO="/snap/steam/current/usr/share/fex-emu:/sn
 #export LD_DEBUG=libs,files
 #export LD_DEBUG_OUTPUT=$SNAP_USER_COMMON/ld-debug
 
-$SNAP/usr/bin/FEXBash $SNAP/bin/desktop-launch "${desktop_launch_args[@]}"
+$SNAP/usr/bin/FEXBash -c $SNAP/bin/desktop-launch "${desktop_launch_args[@]}"
