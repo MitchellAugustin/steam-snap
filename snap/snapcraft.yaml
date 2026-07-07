@@ -262,6 +262,7 @@ parts:
       - -usr/share/doc/libtiff6/changelog.Debian.gz
       - -usr/share/doc/libgraphite2-3/changelog.Debian.gz
       - -usr/share/doc/libgraphite2-3/changelog.Debian.gz
+      - -usr/share/doc/liblcms2-2/changelog.Debian.gz
     organize:
         steam_231_amd64: .
   amd64-rootfs:
