@@ -29,7 +29,7 @@ jobs:
             sudo chmod +r /boot/vmlinuz*
           fi
 
-          git clone https://github.com/MitchellAugustin/RootFS.git "$ROOTFS_DIR"
+          git clone https://github.com/MitchellAugustin/RootFS.git -b steam-snap-enablement "$ROOTFS_DIR"
           mkdir -p "$ROOTFS_DIR/cache_dir" "$ROOTFS_DIR/rootfs_dir"
           cd "$ROOTFS_DIR"
 
