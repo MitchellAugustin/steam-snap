@@ -7,7 +7,7 @@ description: |
 adopt-info: steam
 grade: stable
 confinement: strict
-base: core24
+base: core26
 platforms:
   amd64:
 compression: lzo
@@ -46,8 +46,6 @@ layout:
     bind: $SNAP/usr/lib/x86_64-linux-gnu/alsa-lib
   /usr/share/alsa:
     bind: $SNAP/usr/share/alsa
-  /usr/share/X11/xkb:
-    bind: $SNAP/usr/share/X11/xkb
   /usr/lib/x86_64-linux-gnu/libvulkan_intel.so:
     symlink: $SNAP/graphics/usr/lib/x86_64-linux-gnu/libvulkan_intel.so
   /usr/lib/i386-linux-gnu/libvulkan_intel.so:
@@ -257,13 +255,14 @@ parts:
     source: https://github.com/mesonbuild/meson.git
     source-tag: "1.8.3"
     override-build: |
-      python3 -m pip install . --break-system-packages
+      /usr/bin/python3 -m pip install . --break-system-packages
       mkdir -p $CRAFT_PART_INSTALL/usr/lib/python3/dist-packages
       rm -rf $CRAFT_PART_INSTALL/usr/lib/python3/dist-packages/meson*
-      python3 -m pip install --target=$CRAFT_PART_INSTALL/usr .
+      /usr/bin/python3 -m pip install --target=$CRAFT_PART_INSTALL/usr .
+      /usr/bin/python3 -m pip install --target=$CRAFT_PART_INSTALL/usr mako
       mv $CRAFT_PART_INSTALL/usr/meson* $CRAFT_PART_INSTALL/usr/lib/python3/dist-packages/
-      sed -i "s%^#!/usr/bin/python3$%#!/usr/bin/env python3%g" /usr/local/bin/meson
-      sed -i "s%^#!/usr/bin/python3$%#!/usr/bin/env python3%g" $CRAFT_PART_INSTALL/usr/bin/meson
+      sed -i "s%^#!/usr/bin/env python3$%#!/usr/bin/python3%g" /usr/local/bin/meson
+      sed -i "s%^#!/usr/bin/env python3$%#!/usr/bin/python3%g" $CRAFT_PART_INSTALL/usr/bin/meson
     build-packages:
       - python3-pip
     prime:
@@ -272,7 +271,7 @@ parts:
   mangohud:
     after: [meson-deps]
     source: https://github.com/flightlessmango/MangoHud.git
-    source-tag: "v0.8.1"
+    source-tag: "v0.8.4"
     plugin: meson
     organize:
       snap/steam/current/usr: usr
@@ -305,13 +304,17 @@ parts:
     stage-packages:
       - libxkbcommon0:i386
     override-build: |
-        craftctl default
+        set -eux
+        export PATH="/usr/bin:$PATH"
+        meson setup "$CRAFT_PART_BUILD" "$CRAFT_PART_SRC" --prefix=/usr --libdir=lib/i386-linux-gnu -Dappend_libdir_mangohud=false
+        meson compile -C "$CRAFT_PART_BUILD"
+        meson install -C "$CRAFT_PART_BUILD" --destdir "$CRAFT_PART_INSTALL"
         sed -i 's/\/usr\/\\\$LIB/\$SNAP\/usr\/\\\$LIB/' $CRAFT_PART_INSTALL/usr/bin/mangohud
 
   mangohud64:
     after: [meson-deps, mangohud]
     source: https://github.com/flightlessmango/MangoHud.git
-    source-tag: "v0.8.1"
+    source-tag: "v0.8.4"
     plugin: meson
     organize:
       snap/steam/current/usr: usr
@@ -319,6 +322,12 @@ parts:
       - --prefix=/usr
       - --libdir=lib/x86_64-linux-gnu
       - -Dappend_libdir_mangohud=false
+    override-build: |
+      set -eux
+      export PATH="/usr/bin:$PATH"
+      meson setup "$CRAFT_PART_BUILD" "$CRAFT_PART_SRC" --prefix=/usr --libdir=lib/x86_64-linux-gnu -Dappend_libdir_mangohud=false
+      meson compile -C "$CRAFT_PART_BUILD"
+      meson install -C "$CRAFT_PART_BUILD" --destdir "$CRAFT_PART_INSTALL"
     stage:
       - -usr/bin/mangohud
       - -usr/share/vulkan/implicit_layer.d/MangoHud.json
@@ -329,7 +338,7 @@ parts:
   gamescope:
     after: [meson-deps]
     source: https://github.com/ValveSoftware/gamescope.git
-    source-branch: "3.14.2" # Latest version FTBFS due to wayland-server >=1.23 being needed. 3.14.2 builds.
+    source-branch: "3.16.23.2" # Latest version FTBFS due to wayland-server >=1.23 being needed. 3.14.2 builds.
     source-depth: 1
     source-submodules:
       - subprojects/wlroots
@@ -345,6 +354,9 @@ parts:
       - --prefix=/usr
       - -Dforce_fallback_for=wlroots,libliftoff,vkroots,vulkan-headers
       - -Dpipewire=enabled
+      - -Denable_openvr_support=false
+    build-environment:
+      - CFLAGS: -Wno-error=switch -Wno-error=calloc-transposed-args
     build-packages:
       - cmake
       - wayland-protocols
@@ -427,6 +439,7 @@ parts:
       - --prefix=/usr
       - --libdir=lib/i386-linux-gnu
     build-packages:
+      - systemd-dev
       - libsystemd-dev:i386
       - libdbus-1-dev:i386
       - pkg-config
@@ -446,6 +459,7 @@ parts:
       - --prefix=/usr
       - --libdir=lib/x86_64-linux-gnu
     build-packages:
+      - systemd-dev
       - libsystemd-dev
       - libdbus-1-dev
       - pkg-config
@@ -496,10 +510,6 @@ parts:
       - libpci3
       - libvulkan1:i386
       - libvulkan1:amd64
-      - libxml2:i386
-      - libxml2:amd64
-      - libicu74:i386
-      - libicu74:amd64
       - zlib1g:i386
       - zlib1g:amd64
       - xdg-utils
@@ -513,7 +523,6 @@ parts:
       - usbutils # Allows finding controllers etc
       - psmisc
       - libfuse2:amd64
-      - libfuse2:i386
       - libxss1:amd64
       - libxss1:i386
       - x11-xserver-utils
@@ -550,16 +559,8 @@ parts:
       - libsdl2-2.0-0:amd64
       - libaom3:i386
       - libaom3:amd64
-      - libavcodec60:i386
-      - libavcodec60:amd64
-      - libavutil58:i386
-      - libavutil58:amd64
       - libdav1d7:i386
       - libdav1d7:amd64
-      - libswscale7:i386
-      - libswscale7:amd64
-      - libvpx9:i386
-      - libvpx9:amd64
     override-build: |
       craftctl default
       # Set the snap version from the .deb package version
@@ -587,6 +588,8 @@ parts:
       set -eux
       craftctl default
       cp -a /snap/core24/current/usr/lib/i386-linux-gnu/* usr/lib/i386-linux-gnu/
+      mkdir -p usr/share/X11/xkb
+      touch usr/share/X11/xkb/.keep
 
   yaru-skin:
     plugin: nil
@@ -627,7 +630,8 @@ parts:
       cd /snap/gaming-graphics-core24/current/usr/lib
       find . -type f,l -exec rm -f $CRAFT_PRIME/usr/lib/{} \;
       cd /snap/gaming-graphics-core24/current/usr/share
-      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/share/{} \;
+      find . -type f,l ! -path './X11/xkb/*' -exec rm -f $CRAFT_PRIME/usr/share/{} \;
+      mkdir -p "$CRAFT_PRIME/usr/share/X11/xkb"
 
 apps:
   steam:
