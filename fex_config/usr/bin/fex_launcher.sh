@@ -155,7 +155,7 @@ fi
 
 # Copy Config.json if it differs. (If it doesn't yet exist, don't prompt - just copy) 
 if [ -d $FEX_APP_CONFIG_LOCATION ]; then
-	echo "Your local FEX configuration differs from the latest version provided by the Steam snap. This can happen if, for example, you enabled thunking or other features. Would you like to update your config to the snap-provided config? Diff below: " > $SNAP_USER_COMMON/user_config_diff.txt
+	echo "Your local FEX configuration differs from the latest version provided by the Steam snap. This can happen if, for example, you enabled thunking or other features, or if the Steam snap was updated with a new default config. Would you like to update your config to the snap-provided config? (Select 'Use default config' if you did not manually adjust your config.). Diff below: " > $SNAP_USER_COMMON/user_config_diff.txt
 	diff -ruN $FEX_APP_CONFIG_LOCATION $SNAP/fex_config >> $SNAP_USER_COMMON/user_config_diff.txt
 	if ! diff -ruN "$FEX_APP_CONFIG_LOCATION" "$SNAP/fex_config" > /dev/null && [[ ! -f "$SNAP_USER_COMMON/prefer_custom_user_config" ]]; then
 		echo "Configs differ!"
