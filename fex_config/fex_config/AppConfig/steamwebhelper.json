@@ -1,5 +1,8 @@
 {
   "Comment": "Bypasses libGL's glX and instead sends GLX requests directly via xcb",
+  "Config": {
+    "Multiblock": "0"
+  },
   "ThunksDB": {
     "GL": 0
   }

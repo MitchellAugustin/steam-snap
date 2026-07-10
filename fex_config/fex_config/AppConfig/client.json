@@ -1,5 +1,6 @@
 {
   "Config": {
-    "HideHypervisorBit": "1"
+    "HideHypervisorBit": "1",
+    "Multiblock": "0"
   }
 }
