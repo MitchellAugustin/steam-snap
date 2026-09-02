@@ -1,5 +1,5 @@
 name: steam
-version: '1.0.0.85'
+version: '1.0.0.87'
 summary: Launcher for the Steam software distribution service
 description: |
   Steam is a software distribution service with an online store, automated
@@ -8,7 +8,7 @@ description: |
 adopt-info: steam
 grade: stable
 confinement: strict
-base: core24
+base: core26
 platforms:
   arm64:
     build-on: [arm64]
@@ -148,10 +148,10 @@ layout:
     bind: $SNAP/usr/lib/aarch64-linux-gnu/fex-emu
 
 plugs:
-  gaming-graphics-core24:
+  gaming-graphics-core26:
     interface: content
     target: $SNAP/graphics
-    default-provider: gaming-graphics-core24
+    default-provider: gaming-graphics-core26
   gtk-3-themes:
     interface: content
     target: $SNAP/share/themes
@@ -201,13 +201,13 @@ environment:
   PYTHONPATH: $SNAP/usr/lib/python3/dist-packages
 
 parts:
-  gaming-graphics-core24:
+  gaming-graphics-core26:
     plugin: nil
     build-snaps:
-      - gaming-graphics-core24
+      - gaming-graphics-core26
   amd64-content:
     plugin: dump
-    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-1-26-26/steam_231_amd64.tar.gz
+    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-9-2-26/steam_268_amd64.tar.gz
     stage:
       - -usr/bin/curl
       - -usr/bin/fc-cache
@@ -264,10 +264,10 @@ parts:
       - -usr/share/doc/libgraphite2-3/changelog.Debian.gz
       - -usr/share/doc/liblcms2-2/changelog.Debian.gz
     organize:
-        steam_231_amd64: .
+        steam_268_amd64: .
   amd64-rootfs:
     plugin: dump
-    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-7-8-26/amd64_rootfs.tar.gz
+    source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-9-2-26/amd64_rootfs.tar.gz
     organize:
         amd64_rootfs: .
   fex-emu:
@@ -299,7 +299,7 @@ parts:
       - dpkg-dev
       - dirmngr # Needed for launchpad builds
     build-snaps:
-      - core24
+      - core26
     stage-packages:
       - libappindicator3-1
       - libxcb-dri3-0
@@ -360,12 +360,12 @@ parts:
       - -usr/lib/*/libvulkan*
       - -usr/lib/*/libVk*
       - -usr/lib/*/libLLVM*
-      - -usr/lib/*/libgallium* # provided by gaming-graphics-core24
+      - -usr/lib/*/libgallium* # provided by gaming-graphics-core26
       - -usr/lib/*/libasound.so* # conflicts with alsa-mixin
     override-prime: |
       set -eux
       craftctl default
-      cp -a /snap/core24/current/usr/lib/aarch64-linux-gnu/* usr/lib/aarch64-linux-gnu/
+      cp -a /snap/core26/current/usr/lib/aarch64-linux-gnu/* usr/lib/aarch64-linux-gnu/
 
   
 apps:
