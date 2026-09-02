@@ -28,11 +28,13 @@ lint:
         - usr/lib32/**
 
 package-repositories:
+  # Do not set `architectures` here: craft-archives would then rewrite the
+  # default ubuntu.sources with `Architectures: arm64 armhf`, and armhf is not
+  # published on archive.ubuntu.com, breaking `apt update`.
   - type: apt
     url: http://ports.ubuntu.com/ubuntu-ports/
     suites: [noble, noble-updates]
     components: [main, universe]
-    architectures: [arm64]
     key-id: F6ECB3762474EDA9D21B7022871920D1991BC93C
     key-server: keyserver.ubuntu.com
   - type: apt
@@ -204,7 +206,7 @@ parts:
   gaming-graphics-core26:
     plugin: nil
     build-snaps:
-      - gaming-graphics-core26
+      - gaming-graphics-core26/kisak-fresh/candidate
   amd64-content:
     plugin: dump
     source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-9-2-26/steam_268_amd64.tar.gz
