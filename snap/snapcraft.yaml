@@ -211,6 +211,8 @@ parts:
     plugin: dump
     source: https://github.com/MitchellAugustin/steam-snap/releases/download/amd64-components-9-2-26-2/steam_268_amd64.tar.gz
     stage:
+      # the amd64 snap's own metadata; snapcraft regenerates meta/ for this snap
+      - -meta
       - -usr/bin/curl
       - -usr/bin/fc-cache
       - -usr/bin/fc-cat
@@ -1125,6 +1127,9 @@ parts:
       set -eux
       craftctl default
       cp -a /snap/core26/current/usr/lib/aarch64-linux-gnu/* usr/lib/aarch64-linux-gnu/
+      # snap pack rejects non-world-readable meta dirs; pre-create them 0755 so the
+      # pack step's mkdir(exist_ok=True) can't leave them at the builder's umask.
+      install -d -m 755 meta meta/gui meta/hooks
 
   
 apps:
