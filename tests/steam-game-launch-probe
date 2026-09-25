@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -u
+
+log_directory="$SNAP_USER_COMMON/debug"
+mkdir -p "$log_directory" || exit 1
+log="$log_directory/game-launch-handoff.log"
+printf 'Steam launch probe: recording diagnostics in %s; game command will not run\n' "$log" >&2
+exec >>"$log" 2>&1
+
+printf '\n=== Actual Steam launch-shell invocation ===\n'
+date -Is
+printf 'HOME=%s\nPATH=%s\nSERVICE=%s\n' "$HOME" "$PATH" "${SRT_LAUNCHER_SERVICE_ALONGSIDE_STEAM-}"
+printf 'NAMESPACE=%s\n' "$(readlink /proc/self/ns/mnt)"
+printf 'ARGUMENT_COUNT=%s\n' "$#"
+cat /etc/os-release
+if command -v python3; then
+    python3 --version
+else
+    printf 'Python unavailable in launch-shell namespace\n'
+fi
+
+client="$SNAP_USER_COMMON/.local/share/Steam/steamrtarm64/pv-runtime/steam-runtime-steamrt/pressure-vessel/bin/steam-runtime-launch-client"
+if [[ -n "${SRT_LAUNCHER_SERVICE_ALONGSIDE_STEAM-}" && -x "$client" ]]; then
+    printf '\n=== Explicit private-service request ===\n'
+    "$client" --alongside-steam -- /bin/sh -c 'cat /etc/os-release; readlink /proc/self/ns/mnt; command -v python3'
+    printf 'SERVICE_REQUEST_STATUS=%s\n' "$?"
+else
+    printf 'Private service identity or launch-client executable is missing\n'
+fi
+printf 'Diagnostic complete; requested game command was deliberately not executed\n'
+exit 0

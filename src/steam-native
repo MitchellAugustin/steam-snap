@@ -1,0 +1,146 @@
+#!/usr/bin/python3
+
+import fcntl
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+
+def set_default_proton(root):
+    import vdf
+
+    config = root / "config"
+    config.mkdir(parents=True, exist_ok=True)
+    marker = config / ".snap-proton11-arm64-default"
+    with (config / ".snap-proton-default.lock").open("w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if marker.exists():
+            return
+        pid_path = root / "steam.pid"
+        if pid_path.exists():
+            try:
+                pid = int(pid_path.read_text().strip())
+                if pid <= 0:
+                    raise ValueError("Invalid Steam PID")
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                pass
+            except (OSError, ValueError):
+                print("steam-native: cannot confirm Steam is stopped; deferring Proton default", file=sys.stderr)
+                return
+            else:
+                print("steam-native: Steam is running; deferring Proton default", file=sys.stderr)
+                return
+        path = config / "config.vdf"
+        try:
+            if path.exists():
+                with path.open() as stream:
+                    data = vdf.load(stream, mapper=vdf.VDFDict)
+            else:
+                data = vdf.VDFDict()
+            section = data
+            for key in ("InstallConfigStore", "Software", "Valve", "Steam", "CompatToolMapping"):
+                existing = next((name for name in section if name.casefold() == key.casefold()), key)
+                if existing not in section:
+                    section[existing] = vdf.VDFDict()
+                section = section[existing]
+                if not isinstance(section, vdf.VDFDict):
+                    raise ValueError(f"Expected a section at {key}")
+            while "0" in section:
+                del section["0"]
+            section["0"] = vdf.VDFDict({"name": "proton_11-arm64", "config": "", "priority": "75"})
+            serialized = vdf.dumps(data, pretty=True)
+        except (OSError, ValueError, SyntaxError, TypeError) as error:
+            print(f"steam-native: leaving Proton settings unchanged: {error}", file=sys.stderr)
+            return
+        if path.exists():
+            backup = config / "config.vdf.before-snap-proton11-arm64"
+            if backup.exists():
+                print(f"steam-native: existing Proton backup requires review: {backup}", file=sys.stderr)
+                return
+            shutil.copy2(path, backup)
+        temporary = config / "config.vdf.snap-new"
+        with temporary.open("w") as stream:
+            temporary.chmod(0o600)
+            stream.write(serialized)
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.replace(path)
+        marker.touch(mode=0o600)
+
+
+def seed_client(home, snap):
+    root = home / ".local/share/Steam"
+    platform = root / "steamrtarm64"
+    platform.mkdir(parents=True, exist_ok=True)
+    with (platform / ".snap-bootstrap.lock").open("w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        executable = platform / "steam"
+        if not executable.exists():
+            temporary = platform / "steam.snap-new"
+            shutil.copy2(snap / "usr/lib/steam/steam-arm64", temporary)
+            temporary.chmod(0o755)
+            temporary.replace(executable)
+        runtime = platform / "pv-runtime"
+        runtime.mkdir(exist_ok=True)
+        for source in (snap / "usr/lib/steam/native-runtime").iterdir():
+            target = runtime / source.name
+            if not target.exists():
+                temporary = runtime / (source.name + ".snap-new")
+                shutil.copy2(source, temporary)
+                temporary.replace(target)
+        package = root / "package"
+        package.mkdir(exist_ok=True)
+        beta = package / "beta"
+        if not beta.exists():
+            beta.write_text("publicbeta\n")
+        links = home / ".steam"
+        links.mkdir(exist_ok=True)
+        for name, target in {
+            "root": root, "steam": root, "binarm64": platform,
+            "sdkarm64": root / "linuxarm64",
+        }.items():
+            link = links / name
+            if not os.path.lexists(link):
+                link.symlink_to(target)
+    return root, runtime
+
+
+def client_container_home(root, runtime):
+    home = runtime / "client-container-home"
+    links = home / ".steam"
+    links.mkdir(parents=True, exist_ok=True)
+    for name in ("root", "steam"):
+        link = links / name
+        if not os.path.lexists(link):
+            link.symlink_to(root)
+    return home
+
+
+def main():
+    home = Path(os.environ["SNAP_USER_COMMON"])
+    snap = Path(os.environ["SNAP"])
+    os.environ["HOME"] = str(home)
+    root, runtime = seed_client(home, snap)
+    set_default_proton(root)
+    if sys.argv[1:2] == ["--bootstrap-only"]:
+        print(root)
+        return 0
+    bootstrap = [
+        "/bin/bash", str(runtime / "steam-runtime-steamrt.sh"),
+        "--runtime=steam-runtime-steamrt", f"--unpack-dir={runtime}",
+    ]
+    subprocess.check_output(bootstrap, text=True)
+    client_container_home(root, runtime)
+    service = runtime / "steam-runtime-steamrt/pressure-vessel/libexec/steam-runtime-tools-0/srt-client-container"
+    arguments = [
+        str(service), "--pv-entry-point", str(snap / "bin/steam-native-runtime"),
+        "--", "/bin/bash", str(snap / "bin/steam-native-client"), *sys.argv[1:],
+    ]
+    os.execv(arguments[0], arguments)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

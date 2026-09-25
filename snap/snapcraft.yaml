@@ -5,11 +5,11 @@ description: |
   installation, automatic updates, achievements, SteamCloud synchronized
   savegame and screenshot functionality, and many social features.
 adopt-info: steam
-grade: stable
 confinement: strict
 base: core24
 platforms:
   amd64:
+  arm64:
 compression: lzo
 assumes:
   - snapd2.62
@@ -44,6 +44,8 @@ layout:
     bind: $SNAP/graphics/usr/share/glvnd/egl_vendor.d
   /usr/lib/x86_64-linux-gnu/alsa-lib:
     bind: $SNAP/usr/lib/x86_64-linux-gnu/alsa-lib
+  /usr/lib/aarch64-linux-gnu/alsa-lib:
+    bind: $SNAP/usr/lib/aarch64-linux-gnu/alsa-lib
   /usr/share/alsa:
     bind: $SNAP/usr/share/alsa
   /usr/share/pipewire:
@@ -142,12 +144,16 @@ parts:
     source: ./src
     override-build: |
       mkdir -p $CRAFT_PART_INSTALL/bin
-      cp * $CRAFT_PART_INSTALL/bin/
+      find . -maxdepth 1 -type f -exec cp {} "$CRAFT_PART_INSTALL/bin/" \;
+      chmod 755 "$CRAFT_PART_INSTALL/bin/steam-launch" "$CRAFT_PART_INSTALL/bin/steam-native" "$CRAFT_PART_INSTALL/bin/steam-native-client" "$CRAFT_PART_INSTALL/bin/steam-native-runtime" "$CRAFT_PART_INSTALL/bin/steam-native-game"
+      mkdir -p "$CRAFT_PART_INSTALL/usr/lib/x86_64-linux-gnu/alsa-lib" "$CRAFT_PART_INSTALL/usr/lib/aarch64-linux-gnu/alsa-lib"
     stage-packages:
       - python3-gi
       - gir1.2-gtk-3.0
     stage:
       - bin/*
+      - usr/lib/x86_64-linux-gnu/alsa-lib
+      - usr/lib/aarch64-linux-gnu/alsa-lib
       - usr/lib/python3/dist-packages/*
       - usr/share/mime/*
       - usr/share/icons/*
@@ -227,7 +233,10 @@ parts:
     plugin: nil
     source: https://github.com/ninja-build/ninja.git
     source-tag: "v1.13.1"
+    override-pull: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
     override-build: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" != amd64 ]; then exit 0; fi
       rm -rf build
       rm -f ninja
       rm -f ninja_bootstrap
@@ -249,7 +258,10 @@ parts:
     plugin: nil
     source: https://github.com/mesonbuild/meson.git
     source-tag: "1.8.3"
+    override-pull: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
     override-build: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" != amd64 ]; then exit 0; fi
       python3 -m pip install . --break-system-packages
       mkdir -p $CRAFT_PART_INSTALL/usr/lib/python3/dist-packages
       rm -rf $CRAFT_PART_INSTALL/usr/lib/python3/dist-packages/meson*
@@ -259,6 +271,8 @@ parts:
       sed -i "s%^#!/usr/bin/python3$%#!/usr/bin/env python3%g" $CRAFT_PART_INSTALL/usr/bin/meson
     build-packages:
       - python3-pip
+      - on arm64:
+          - meson
     prime:
       - -*
 
@@ -267,6 +281,12 @@ parts:
     source: https://github.com/flightlessmango/MangoHud.git
     source-tag: "v0.8.1"
     plugin: meson
+    override-pull: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-stage: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-prime: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
     organize:
       snap/steam/current/usr: usr
     build-environment:
@@ -278,26 +298,29 @@ parts:
       - --libdir=lib/i386-linux-gnu/mangohud
       - -Dappend_libdir_mangohud=false
     build-packages:
-      - gcc
-      - gcc-multilib
-      - g++
-      - g++-multilib
-      - glslang-dev
-      - glslang-tools
-      - libdbus-1-dev
-      - libgl-dev
-      - libglvnd-dev
-      - libx11-dev
-      - libxnvctrl-dev
-      - mesa-common-dev
-      - python3-mako
-      - libwayland-dev:i386
-      - libwayland-dev
-      - libxkbcommon-dev:i386
-      - libxkbcommon-dev
+      - on amd64:
+          - gcc
+          - gcc-multilib
+          - g++
+          - g++-multilib
+          - glslang-dev
+          - glslang-tools
+          - libdbus-1-dev
+          - libgl-dev
+          - libglvnd-dev
+          - libx11-dev
+          - libxnvctrl-dev
+          - mesa-common-dev
+          - python3-mako
+          - libwayland-dev:i386
+          - libwayland-dev
+          - libxkbcommon-dev:i386
+          - libxkbcommon-dev
     stage-packages:
-      - libxkbcommon0:i386
+      - on amd64:
+          - libxkbcommon0:i386
     override-build: |
+        if [ "$CRAFT_ARCH_BUILD_FOR" != amd64 ]; then exit 0; fi
         craftctl default
         sed -i 's|MANGOHUD_LIB_NAME="/usr/\\$LIB/libMangoHud_shim.so"|MANGOHUD_LIB_NAME="/usr/lib/x86_64-linux-gnu/mangohud/libMangoHud_shim.so"|' $CRAFT_PART_INSTALL/usr/bin/mangohud
 
@@ -306,6 +329,14 @@ parts:
     source: https://github.com/flightlessmango/MangoHud.git
     source-tag: "v0.8.1"
     plugin: meson
+    override-pull: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-build: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-stage: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-prime: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
     organize:
       snap/steam/current/usr: usr
     meson-parameters:
@@ -324,6 +355,14 @@ parts:
     source: https://github.com/FeralInteractive/gamemode.git
     source-tag: "1.8.2"
     plugin: meson
+    override-pull: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-build: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-stage: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-prime: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
     build-environment:
       - CC: gcc -m32
       - CXX: g++ -m32
@@ -334,9 +373,10 @@ parts:
       - --prefix=/usr
       - --libdir=lib/i386-linux-gnu
     build-packages:
-      - libsystemd-dev:i386
-      - libdbus-1-dev:i386
-      - pkg-config
+      - on amd64:
+          - libsystemd-dev:i386
+          - libdbus-1-dev:i386
+          - pkg-config
     stage:
       - usr/bin/gamemode*
       - usr/lib/*/libgamemode*.so.*
@@ -347,6 +387,14 @@ parts:
     source: https://github.com/FeralInteractive/gamemode.git
     source-tag: "1.8.2"
     plugin: meson
+    override-pull: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-build: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-stage: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
+    override-prime: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then craftctl default; fi
     organize:
       snap/steam/current/usr: usr
     meson-parameters:
@@ -382,94 +430,157 @@ parts:
 
   steam:
     plugin: nil
-    #source: http://repo.steampowered.com/steam/archive/precise/steam_latest.deb
+    source: ./tools
     build-packages:
       - dpkg-dev
       - dirmngr # Needed for launchpad builds
+      - on arm64:
+          - curl
+          - unzip
+          - ca-certificates
     build-snaps:
-      - core24
+      - on amd64:
+          - core24
     stage-packages:
-      - steam-launcher
-      - steam-libs-amd64
-      - steam-libs-i386
-      - libappindicator3-1
-      - libxcb-dri3-0:amd64
-      - libxcb-dri3-0:i386
-      - xkb-data
-      - libpci3
-      - libvulkan1:i386
-      - libvulkan1:amd64
-      - libxml2:i386
-      - libxml2:amd64
-      - libicu74:i386
-      - libicu74:amd64
-      - zlib1g:i386
-      - zlib1g:amd64
-      - xdg-utils
-      - xdg-user-dirs
-      - fontconfig-config
-      - fontconfig:i386
-      - fontconfig:amd64
-      - pciutils
-      - lsof
-      - locales-all
-      - usbutils # Allows finding controllers etc
-      - psmisc
-      - libfuse2:amd64
-      - libfuse2:i386
-      - libxss1:amd64
-      - libxss1:i386
-      - x11-xserver-utils
-      - libxtst6:amd64
-      - libxtst6:i386
-      - libibus-1.0-5
-      - libxrandr2:amd64
-      - libxrandr2:i386
-      - libxi6:amd64
-      - libxi6:i386
-      - pipewire
-      - libpipewire-0.3-0t64:amd64
-      - libpipewire-0.3-0t64:i386
-      - libpipewire-0.3-modules:amd64
-      - libpipewire-0.3-modules:i386
-      - libopenal1:amd64
-      - libopenal1:i386
-      - libpulse0:amd64
-      - libpulse0:i386
-      - libnm0:amd64
-      - libnm0:i386
-      - libglib2.0-0t64:amd64
-      - libglib2.0-0t64:i386
-      - libxfixes3:amd64
-      - libxfixes3:i386
-      - libgtk2.0-0t64:amd64
-      - libgtk2.0-0t64:i386
-      - libxcb-res0:amd64
-      - libxcb-res0:i386
-      - liblzma5:amd64
-      - liblzma5:i386
-      - libice6:i386
-      - libice6:amd64
-      - libsm6:i386
-      - libsm6:amd64
-      - libsdl2-2.0-0:i386
-      - libsdl2-2.0-0:amd64
-      - libaom3:i386
-      - libaom3:amd64
-      - libavcodec60:i386
-      - libavcodec60:amd64
-      - libavutil58:i386
-      - libavutil58:amd64
-      - libdav1d7:i386
-      - libdav1d7:amd64
-      - libswscale7:i386
-      - libswscale7:amd64
-      - libvpx9:i386
-      - libvpx9:amd64
+      - on amd64:
+          - steam-launcher
+          - steam-libs-amd64
+          - steam-libs-i386
+          - libappindicator3-1
+          - libxcb-dri3-0:amd64
+          - libxcb-dri3-0:i386
+          - xkb-data
+          - libpci3
+          - libvulkan1:i386
+          - libvulkan1:amd64
+          - libxml2:i386
+          - libxml2:amd64
+          - libicu74:i386
+          - libicu74:amd64
+          - zlib1g:i386
+          - zlib1g:amd64
+          - xdg-utils
+          - xdg-user-dirs
+          - fontconfig-config
+          - fontconfig:i386
+          - fontconfig:amd64
+          - pciutils
+          - lsof
+          - locales-all
+          - usbutils # Allows finding controllers etc
+          - psmisc
+          - libfuse2:amd64
+          - libfuse2:i386
+          - libxss1:amd64
+          - libxss1:i386
+          - x11-xserver-utils
+          - libxtst6:amd64
+          - libxtst6:i386
+          - libibus-1.0-5
+          - libxrandr2:amd64
+          - libxrandr2:i386
+          - libxi6:amd64
+          - libxi6:i386
+          - pipewire
+          - libpipewire-0.3-0t64:amd64
+          - libpipewire-0.3-0t64:i386
+          - libpipewire-0.3-modules:amd64
+          - libpipewire-0.3-modules:i386
+          - libopenal1:amd64
+          - libopenal1:i386
+          - libpulse0:amd64
+          - libpulse0:i386
+          - libnm0:amd64
+          - libnm0:i386
+          - libglib2.0-0t64:amd64
+          - libglib2.0-0t64:i386
+          - libxfixes3:amd64
+          - libxfixes3:i386
+          - libgtk2.0-0t64:amd64
+          - libgtk2.0-0t64:i386
+          - libxcb-res0:amd64
+          - libxcb-res0:i386
+          - liblzma5:amd64
+          - liblzma5:i386
+          - libice6:i386
+          - libice6:amd64
+          - libsm6:i386
+          - libsm6:amd64
+          - libsdl2-2.0-0:i386
+          - libsdl2-2.0-0:amd64
+          - libaom3:i386
+          - libaom3:amd64
+          - libavcodec60:i386
+          - libavcodec60:amd64
+          - libavutil58:i386
+          - libavutil58:amd64
+          - libdav1d7:i386
+          - libdav1d7:amd64
+          - libswscale7:i386
+          - libswscale7:amd64
+          - libvpx9:i386
+          - libvpx9:amd64
+      - on arm64:
+          - libappindicator3-1
+          - libxcb-dri3-0
+          - xkb-data
+          - libpci3
+          - libvulkan1
+          - libxml2
+          - libicu74
+          - zlib1g
+          - xdg-utils
+          - xdg-user-dirs
+          - fontconfig-config
+          - fontconfig
+          - pciutils
+          - lsof
+          - locales-all
+          - usbutils
+          - psmisc
+          - libfuse2
+          - libxss1
+          - x11-xserver-utils
+          - libxtst6
+          - libibus-1.0-5
+          - libxrandr2
+          - libxi6
+          - pipewire
+          - libpipewire-0.3-0t64
+          - libpipewire-0.3-modules
+          - libopenal1
+          - libpulse0
+          - libnm0
+          - libglib2.0-0t64
+          - libxfixes3
+          - libgtk2.0-0t64
+          - libxcb-res0
+          - liblzma5
+          - libice6
+          - libsm6
+          - libsdl2-2.0-0
+          - libaom3
+          - libavcodec60
+          - libavutil58
+          - libdav1d7
+          - libswscale7
+          - libvpx9
+          - ca-certificates
+          - python3
+          - bubblewrap
+          - libarchive13t64
+          - libxft2
+          - xz-utils
+          - python3-vdf
     override-build: |
+      if [ "$CRAFT_ARCH_BUILD_FOR" = arm64 ]; then
+        bash "$CRAFT_PROJECT_DIR/tools/fetch-arm64.sh"
+        exit 0
+      fi
       craftctl default
       # Set the snap version from the .deb package version
       craftctl set version=$(dpkg-parsechangelog -l $CRAFT_PART_INSTALL/usr/share/doc/steam-launcher/changelog.*.gz -S Version | sed -e s/1://g)
+      craftctl set grade=stable
     prime:
       - -usr/include
       - -usr/share/man
@@ -491,7 +602,9 @@ parts:
     override-prime: |
       set -eux
       craftctl default
-      cp -a /snap/core24/current/usr/lib/i386-linux-gnu/* usr/lib/i386-linux-gnu/
+      if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then
+        cp -a /snap/core24/current/usr/lib/i386-linux-gnu/* usr/lib/i386-linux-gnu/
+      fi
 
   yaru-skin:
     plugin: nil
@@ -537,7 +650,7 @@ parts:
 apps:
   steam:
     command-chain: [snap/command-chain/alsa-launch, bin/desktop-launch]
-    command: usr/lib/steam/bin_steam.sh -no-cef-sandbox
+    command: bin/steam-launch -no-cef-sandbox
     environment:
       HOME: $SNAP_USER_COMMON
       #LIBGL_DEBUG: verbose

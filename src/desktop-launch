@@ -82,8 +82,16 @@ else
 fi
 
 # Force i386
-export ARCH="i386-linux-gnu"
+if [ "$SNAP_ARCH" = "amd64" ]; then
+  ARCH="i386-linux-gnu"
+fi
+export ARCH
 export SNAP_LAUNCHER_ARCH_TRIPLET="$ARCH"
+if [ "$SNAP_ARCH" = arm64 ]; then
+  export LD_LIBRARY_PATH="$SNAP/graphics/usr/lib/aarch64-linux-gnu:$SNAP/usr/lib/aarch64-linux-gnu:$SNAP/lib/aarch64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  export GI_TYPELIB_PATH="$SNAP/usr/lib/aarch64-linux-gnu/girepository-1.0"
+  export PKG_CONFIG_PATH="$SNAP/usr/lib/aarch64-linux-gnu/pkgconfig:$SNAP/usr/lib/pkgconfig"
+fi
 
 ###############################################
 # Launcher common exports for any desktop app #
@@ -408,7 +416,9 @@ strip_unreachable_dirs XDG_SPECIAL_DIRS
 # That said, they're really rare so it's not a big deal
 export APPIMAGE_EXTRACT_AND_RUN=1
 
-$SNAP/bin/nvidia32 &
+if [ "$SNAP_ARCH" = "amd64" ]; then
+  "$SNAP/bin/nvidia32" &
+fi
 
 # Let `snap set steam gamepadui=true` make the "steam" app always start
 # in Big Picture / gamepadui mode, the same way a Steam Deck boots
@@ -418,5 +428,8 @@ if [[ "$1" == *"/bin_steam.sh" ]] && [ "$(snapctl get gamepadui 2>/dev/null)" = 
     set -- "$@" -gamepadui
 fi
 
+if [ "$SNAP_ARCH" = "arm64" ]; then
+  exec "$@"
+fi
 "$@"
 killall steam-runtime-launcher-service

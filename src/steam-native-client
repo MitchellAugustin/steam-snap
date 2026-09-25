@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -u
+
+export HOME="$SNAP_USER_COMMON"
+export SNAP_STEAM_LAUNCH_SERVICE="${SRT_LAUNCHER_SERVICE_ALONGSIDE_STEAM:?Missing outer launch service}"
+export STEAM_GAME_LAUNCH_SHELL="$SNAP/bin/steam-native-game"
+steam_root="$HOME/.local/share/Steam"
+platform="$steam_root/steamrtarm64"
+export LD_LIBRARY_PATH="$platform:$platform/panorama:$platform/libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+cd "$steam_root" || exit 1
+while true; do
+    "$platform/steam" "$@"
+    status=$?
+    if [ "$status" -ne 42 ]; then
+        exit "$status"
+    fi
+done

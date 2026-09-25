@@ -1,3 +1,7 @@
+# Note on this branch
+
+This branch is not intended for end-users at this time.
+
 # Steam Snap
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/steam)
@@ -10,7 +14,7 @@ run the games separate from the underlying host operating system.
 To build this snap locally, you need [Snapcraft][2].  The project can
 be built with the following command:
 
-    snapcraft --use-lxd
+    snapcraft
 
 Install with
 

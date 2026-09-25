@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eu
+
+case "$SNAP_ARCH" in
+    arm64) exec "$SNAP/bin/steam-native" "$@" ;;
+    amd64) exec "$SNAP/usr/lib/steam/bin_steam.sh" "$@" ;;
+    *) printf 'Unsupported Steam architecture: %s\n' "$SNAP_ARCH" >&2; exit 1 ;;
+esac

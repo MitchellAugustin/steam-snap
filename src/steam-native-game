@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -eu
+
+if [[ "$#" -ne 1 ]]; then
+    printf 'steam-native-game: expected one shell command\n' >&2
+    exit 2
+fi
+service="${SNAP_STEAM_LAUNCH_SERVICE:?Missing private outer launch service}"
+case "$service" in
+    com.steampowered.PressureVessel.LaunchAlongsideSteam.Instance*) ;;
+    *) printf 'steam-native-game: refusing non-private launch service\n' >&2; exit 2 ;;
+esac
+client="$SNAP_USER_COMMON/.local/share/Steam/steamrtarm64/pv-runtime/steam-runtime-steamrt/pressure-vessel/bin/steam-runtime-launch-client"
+exec "$client" --bus-name="$service" --directory="$PWD" \
+    --pass-env-matching='STEAM_COMPAT_*' \
+    --pass-env-matching='STEAM_APP*' \
+    --pass-env-matching='STEAM_FEX_*' \
+    --pass-env-matching='Steam*' \
+    --pass-env-matching='SDL*' \
+    --pass-env-matching='FEX*' \
+    --pass-env-matching='PROTON*' \
+    --pass-env-matching='WINE*' \
+    --pass-env-matching='DXVK*' \
+    --pass-env-matching='VKD3D*' \
+    --pass-env=LD_PRELOAD \
+    -- /bin/sh -c "$1"
