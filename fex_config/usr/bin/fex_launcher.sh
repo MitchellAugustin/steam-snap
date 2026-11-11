@@ -192,4 +192,21 @@ export PRESSURE_VESSEL_FILESYSTEMS_RO="/snap/steam/current/usr/share/fex-emu:/sn
 #export LD_DEBUG=libs,files
 #export LD_DEBUG_OUTPUT=$SNAP_USER_COMMON/ld-debug
 
+# Install the MangoHud wrapper from the snap over the rootfs's own
+# /usr/bin/mangohud. The rootfs already carries the full amd64 MangoHud
+# install (libs + Vulkan layer manifest, see snap/snapcraft.yaml mangohud
+# part), but its wrapper uses a static LD_PRELOAD path that only resolves if
+# FEX roots the standard multiarch prefix at the rootfs; the snap's wrapper
+# uses the concrete host path into the extracted rootfs, so it works either
+# way. Do NOT overwrite the rootfs's layer manifest: it is matched to the
+# rootfs's MangoHud library version (loader interface negotiation).
+# Defensive: no-op if the rootfs or the snap-provided file is absent.
+if [ -d "$FEX_ROOTFS" ]; then
+	if [ -f "$SNAP/mangohud/mangohud" ]; then
+		mkdir -p "$FEX_ROOTFS/usr/bin"
+		cp -f "$SNAP/mangohud/mangohud" "$FEX_ROOTFS/usr/bin/mangohud"
+		chmod +x "$FEX_ROOTFS/usr/bin/mangohud"
+	fi
+fi
+
 $SNAP/usr/bin/FEXBash -c $SNAP/bin/desktop-launch "${desktop_launch_args[@]}"

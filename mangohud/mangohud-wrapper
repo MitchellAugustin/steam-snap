@@ -1,0 +1,80 @@
+#!/bin/sh
+#
+# MangoHud launcher for the Steam snap (arm64 + FEX).
+#
+# Games run as x86-64 under FEX inside the x86 rootfs, so the MangoHud shim
+# must be the amd64 build, resident in the rootfs. This wrapper points
+# LD_PRELOAD at that rootfs-resident shim and sets MANGOHUD=1, then execs the
+# game command.
+#
+# The rootfs is extracted to $SNAP_USER_COMMON/x86_rootfs by fex_launcher.sh,
+# which also exports FEX_ROOTFS and installs this wrapper over the rootfs's
+# own /usr/bin/mangohud (whose static LD_PRELOAD path only resolves if FEX
+# roots the standard multiarch prefix at the rootfs). The rootfs already
+# carries the full amd64 MangoHud 0.8.4 install:
+#   /usr/lib/x86_64-linux-gnu/mangohud/{libMangoHud_shim.so,libMangoHud_opengl.so,libMangoHud.so}
+#   /usr/share/vulkan/implicit_layer.d/MangoHud.x86_64.json
+
+if [ "$#" -eq 0 ]; then
+    programname=$(basename "$0")
+    echo "ERROR: No program supplied"
+    echo
+    echo "Usage: $programname <program>"
+    exit 1
+fi
+
+# Add exe names newline separated to the string to disable LD_PRELOAD
+DISABLE_LD_PRELOAD="
+cs2.sh
+RiseOfTheTombRaider.sh
+"
+
+if [ "$1" = "--version" ]; then
+    echo v0.8.4
+    exit 0
+fi
+
+if [ "$1" = "--dlsym" ]; then
+    # no-op, dlsym enabled by default
+    shift
+fi
+
+# Locate the x86 rootfs that holds the amd64 MangoHud libraries.
+# FEX_ROOTFS is exported by fex_launcher.sh; fall back to its standard location.
+X86_ROOTFS="${FEX_ROOTFS:-$SNAP_USER_COMMON/x86_rootfs}"
+# Normalise a possibly-trailing slash before joining the path.
+X86_ROOTFS="${X86_ROOTFS%/}"
+
+# The shim path as seen by the x86-64 dynamic linker. We use the concrete host
+# path into the extracted rootfs so it resolves regardless of how FEX maps the
+# standard multiarch prefixes. The shim dlopens the adjacent libMangoHud_opengl.so
+# from the same directory, so both must sit in the rootfs mangohud dir.
+MANGOHUD_LIB_NAME="$X86_ROOTFS/usr/lib/x86_64-linux-gnu/mangohud/libMangoHud_shim.so"
+
+# grab all arguments from command_line
+command_line="$*"
+# flag for disable_preload
+disable_preload=false
+
+# Check if the script name or any of the executables in DISABLE_LD_PRELOAD are in the command line
+for exe in $DISABLE_LD_PRELOAD; do
+    if echo "$command_line" | grep -q "$exe"; then
+        disable_preload=true
+        break
+    fi
+done
+
+if [ "$disable_preload" = true ]; then
+    exec env MANGOHUD=1 "$@"
+else
+    # Make sure we don't append mangohud lib multiple times
+    # otherwise, this could cause issues with the steam runtime
+    case ":${LD_PRELOAD-}:" in
+        (*:$MANGOHUD_LIB_NAME:*)
+            ;;
+        (*)
+            LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}${MANGOHUD_LIB_NAME}"
+    esac
+
+    exec env MANGOHUD=1 LD_PRELOAD="${LD_PRELOAD}" "$@"
+fi
